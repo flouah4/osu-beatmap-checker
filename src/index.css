@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neo-purple: #cca2c0;
+  --color-dark-neo-purple: #614054;
+  --color-background: #f5e1e1;
+  --color-neo-blue: #cfdde7;
+  --color-neo-yellow: #ffdeaf;
+  --color-neo-green: #d0f2cb;
+  --color-neo-red: #f89290;
+  --color-input: #fff8f8;
+
+  --text-title: 24px;
+  --text-title--font-weight: 700;
+  --text-lead: 18px;
+  --text-lead--font-weight: 700;
+  --text-regular: 16px;
+  --text-regular--font-weight: 700;
+  --text-small: 14px;
+  --text-small--font-weight: 500;
+  --text-small-bold: 14px;
+  --text-small-bold--font-weight: 700;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  color: var(--color-dark-neo-purple);
+}
+
+.drag {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.neo-box {
+  box-shadow: 2px 2px 0px 0px var(--color-dark-neo-purple);
+  border-width: 2px;
+  border-radius: 4px;
+}
+
+.neo-box:hover {
+  translate: 2px 2px;
+  box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
+}
+
+.scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
