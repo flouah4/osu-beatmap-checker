@@ -1,12 +1,12 @@
 export interface ICheck {
   id: CheckId;
   status: CheckStatus;
-  variant: CheckVariant | null;
-  /** For example, { declared_bitrate: 192, true_bitrate: 128 } */
-  args: Record<string, any>;
+  title: string;
+  details: string[];
 }
 
 export enum CheckId {
+  AudioMissing = "audio_missing",
   AudioOverencoded = "audio_overencoded",
   SamplesMatchPlaybackRate = "samples_match_playback_rate",
   EpilepsyWarning = "epilepsy_warning",
@@ -21,8 +21,4 @@ export enum CheckStatus {
   Ok = "ok",
   Warning = "warning",
   Issue = "issue",
-}
-
-export enum CheckVariant {
-  MissingAudio = "missing_audio",
 }

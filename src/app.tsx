@@ -1,9 +1,10 @@
-import { Layout } from "./components/layout/layout";
+import { Beatmap } from "./components/beatmap";
+import { Layout } from "./layout/layout";
 
 export function App() {
   return (
     <Layout>
-      Hi
+      <Beatmap />
     </Layout>
   );
 }

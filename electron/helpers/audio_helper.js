@@ -92,7 +92,7 @@ async function get_cutoff_bitrate(audio_path) {
   return Math.floor(cutoff_hz / 100);
 }
 
-export async function get_header_bitrate(audio_path) {
+async function get_header_bitrate(audio_path) {
   const metadata = await parseFile(audio_path, { skipCovers: true });
   if (!metadata.format.bitrate) {
     throw new Error("No bitrate field in metadata.format");
@@ -143,11 +143,10 @@ export async function check_overencoded_audio(osu_files, beatmap_folder_path) {
   }
 
   if (!audio_file) {
-    console.log("Audio is missing");
     return {
-      id: "overencoded_audio",
+      id: "audio_missing",
       status: "issue",
-      variant: "missing_audio",
+      title: "Audio is missing",
     };
   }
 
@@ -160,11 +159,22 @@ export async function check_overencoded_audio(osu_files, beatmap_folder_path) {
   const check = {
     id: "overencoded_audio",
     status: "ok",
-    variant: null,
-    details: { header_bitrate, cutoff_bitrate, expected_cutoff_bitrate },
+    title: "Audio must not be encoded upwards from a lower bitrate",
+    details: [
+      `The audio is declared as ${header_bitrate} kbps with a cut-off at ${
+        cutoff_bitrate / 10
+      } kHz which means it's not overencoded.`,
+    ],
   };
   if (cutoff_bitrate < expected_cutoff_bitrate) {
     check.status = "issue";
+    check.details = [
+      `The audio is declared as ${header_bitrate} kbps with a cut-off at ${
+        cutoff_bitrate / 10
+      } kHz when the expected cut-off for this bitrate is ${
+        expected_cutoff_bitrate / 10
+      } kHz. The audio must be encoded downwards to avoid file size bloat or it must be changed to a better version.`,
+    ];
   }
   console.log("Checked overencoded audio", check);
   return check;

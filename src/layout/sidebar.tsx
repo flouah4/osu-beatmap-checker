@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import { useDebounce } from "../../hooks/use_debounce";
-import { useBeatmap } from "../../context/beatmap_context";
-
-interface IBeatmapInfo {
-  id: number;
-  artist: string;
-  title: string;
-  creator: string;
-}
+import { useDebounce } from "../hooks/use_debounce";
+import { useBeatmap } from "../context/beatmap_context";
+import type { IBeatmap } from "../types/beatmap_interface";
 
 export function Sidebar() {
-  const [beatmaps, setBeatmaps] = useState<IBeatmapInfo[]>([]);
+  const [beatmaps, setBeatmaps] = useState<IBeatmap[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [search, setSearch] = useState<string>("");
@@ -22,18 +16,18 @@ export function Sidebar() {
     setIsLoading(true);
     (window as any).api.osu
       .get_beatmaps(value)
-      .then((result: IBeatmapInfo[]) => {
+      .then((result: IBeatmap[]) => {
         setIsLoading(false);
         setBeatmaps(result);
       });
   }, [value]);
 
   useEffect(() => {
-    console.log("Logging new beatmaps", beatmaps);
+    console.log("Logging sidebar beatmaps", beatmaps);
   }, [beatmaps]);
 
   return (
-    <div className="flex flex-col gap-4 border-r-4 p-4 w-[300px] overflow-auto scrollbar-hidden">
+    <div className="flex flex-col gap-4 border-r-4 p-4 max-w-[300px] overflow-auto scrollbar-hidden">
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}

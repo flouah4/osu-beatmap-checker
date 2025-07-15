@@ -15,8 +15,8 @@ function get_osu_songs_path() {
   }
 }
 
-export async function get_osu_beatmaps(search = "") {
-  console.log("Executing function (get_osu_beatmaps)", search);
+export async function get_beatmaps(search = "") {
+  console.log("Executing function (get_beatmaps)", search);
 
   const songs_path = get_osu_songs_path();
   const entries = await fs.readdir(songs_path, { withFileTypes: true });
@@ -75,10 +75,103 @@ export async function get_osu_beatmaps(search = "") {
       artist: metadata.Artist,
       title: metadata.Title,
       creator: metadata.Creator,
+      /**
+       * This function does not include the difficulties because
+       * the maps are only shown in the sidebar
+       */
+      difficulties: [],
     });
   }
 
   return beatmaps;
+}
+
+async function get_beatmap_difficulties(beatmap_folder_path, osu_files) {
+  console.log("Executing function (get_beatmap_difficulties)", {
+    beatmap_folder_path,
+    osu_files,
+  });
+
+  const difficulties = [];
+
+  for (const osu_file of osu_files) {
+    const lines = (
+      await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
+    ).split(/\r?\n/);
+
+    let in_metadata = false;
+    let id = null;
+    let name = null;
+
+    for (const line of lines) {
+      if (line === "[Metadata]") {
+        in_metadata = true;
+        continue;
+      }
+      if (in_metadata) {
+        if (line.startsWith("[")) {
+          break;
+        }
+
+        const [key, value] = line.split(":");
+
+        if (key === "BeatmapID") {
+          id = +value;
+        } else if (key === "Version") {
+          name = value.trim();
+        }
+      }
+    }
+
+    if (id !== null && name !== null) {
+      difficulties.push({ id, name });
+    }
+  }
+
+  return difficulties;
+}
+
+async function get_beatmap(beatmap_folder_path, beatmap_files) {
+  console.log("Executing function (get_beatmap)", {
+    beatmap_folder_path,
+    beatmap_files,
+  });
+
+  const osu_files = beatmap_files.filter((file) => file.endsWith(".osu"));
+  const osu_file = osu_files[0];
+
+  const lines = (
+    await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
+  ).split(/\r?\n/);
+
+  const metadata = {};
+  let in_metadata = false;
+  for (const line of lines) {
+    if (line.trim() === "[Metadata]") {
+      in_metadata = true;
+      continue;
+    }
+    if (in_metadata) {
+      if (line.startsWith("[")) {
+        break;
+      }
+      const [key, value] = line.split(":");
+      metadata[key] = value || null;
+    }
+  }
+
+  const difficulties = await get_beatmap_difficulties(
+    beatmap_folder_path,
+    osu_files
+  );
+
+  return {
+    id: +metadata.BeatmapSetID,
+    artist: metadata.Artist,
+    title: metadata.Title,
+    creator: metadata.Creator,
+    difficulties,
+  };
 }
 
 export async function check_beatmap(beatmap_id) {
@@ -86,20 +179,22 @@ export async function check_beatmap(beatmap_id) {
 
   const songs_path = get_osu_songs_path();
   const entries = await fs.readdir(songs_path, { withFileTypes: true });
-
   const dirent = entries.find(
     (e) => e.isDirectory() && e.name.split(" ")[0] === String(beatmap_id)
   );
 
-  const folder_path = path.join(songs_path, dirent.name);
-
-  const beatmap_files = await fs.readdir(folder_path);
+  const beatmap_folder_path = path.join(songs_path, dirent.name);
+  const beatmap_files = await fs.readdir(beatmap_folder_path);
   const osu_files = beatmap_files.filter((f) => f.endsWith(".osu"));
+
+  const beatmap = await get_beatmap(beatmap_folder_path, beatmap_files);
 
   const overencoded_audio_check = await check_overencoded_audio(
     osu_files,
-    folder_path
+    beatmap_folder_path
   );
 
-  return [overencoded_audio_check];
+  const checks = [overencoded_audio_check];
+
+  return { beatmap, checks };
 }

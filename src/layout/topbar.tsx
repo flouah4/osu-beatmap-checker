@@ -1,4 +1,4 @@
-import { APP_VERSION } from "../../data/version";
+import { APP_VERSION } from "../data/version";
 
 export function Topbar() {
   function openUrl(url: string) {
@@ -13,7 +13,7 @@ export function Topbar() {
 
   return (
     <div className="flex border-b-4 divide-x-4">
-      <div className="drag bg-neo-purple px-4 py-2 flex items-center justify-between w-full">
+      <div className="drag bg-neo-blue px-4 py-2 flex items-center justify-between w-full">
         <p>
           <span className="text-title">Beatmap Checker</span>{" "}
           <span className="text-small-bold">by</span>{" "}
