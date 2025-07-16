@@ -1,5 +1,8 @@
 import { useBeatmap } from "../context/beatmap_context";
 import { CheckStatus, type ICheck } from "../types/check_interface";
+import okCheckSvg from "../assets/ok_check.svg";
+import warningCheckSvg from "../assets/warning_check.svg";
+import issueCheckSvg from "../assets/issue_check.svg";
 
 export function Beatmap() {
   const { beatmap, isLoading, generalStatus, checks } = useBeatmap();
@@ -44,69 +47,13 @@ export function Beatmap() {
               } p-0.5 rounded-[4px] ring-2 ring-inset h-fit`}
             >
               {check.status === CheckStatus.Ok && (
-                <svg
-                  width="16"
-                  height="17"
-                  viewBox="0 0 16 17"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M13.3334 4.5L6.00002 11.8333L2.66669 8.5"
-                    stroke="#614054"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <img src={okCheckSvg} alt="Ok" />
               )}
               {check.status === CheckStatus.Warning && (
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8 5.33337V8.00004"
-                    stroke="#614054"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M8 10.6666H8.00667"
-                    stroke="#614054"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <img src={warningCheckSvg} alt="Warning" />
               )}
               {check.status === CheckStatus.Issue && (
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 4L4 12"
-                    stroke="#614054"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M4 4L12 12"
-                    stroke="#614054"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <img src={issueCheckSvg} alt="Issue" />
               )}
             </div>
             <div className="flex flex-col gap-1">
