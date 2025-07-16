@@ -8,6 +8,8 @@ import { OverencodedAudioCheck } from "../checks/audio/overencoded_audio_check.j
 import { MissingAudioCheck } from "../checks/audio/missing_audio_check.js";
 
 async function get_cutoff_frequency(audio_path) {
+  /** Gets the audio cutoff frequency like you would do in spek */
+
   // 1) spawn ffmpeg to decode to raw 32-bit float PCM, mono, 44.1 kHz
   const sample_rate = 44100;
   const ff = spawn(

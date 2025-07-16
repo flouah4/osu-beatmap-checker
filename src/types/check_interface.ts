@@ -6,8 +6,8 @@ export interface ICheck {
 }
 
 export enum CheckId {
-  AudioMissing = "audio_missing",
-  AudioOverencoded = "audio_overencoded",
+  MissingAudio = "missing_audio",
+  OverencodedAudio = "overencoded_audio",
   SamplesMatchPlaybackRate = "samples_match_playback_rate",
   EpilepsyWarning = "epilepsy_warning",
   LetterboxDuringBreaks = "letterbox_during_breaks",

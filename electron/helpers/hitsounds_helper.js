@@ -19,7 +19,7 @@ export async function check_samples_match_playback_rate(
     ).split(/\r?\n/);
     for (const line of lines) {
       if (line.startsWith("SamplesMatchPlaybackRate")) {
-        const [_, value] = line.split(":");
+        const [, value] = line.split(":");
         if (value.trim() === "1") {
           samples_match_playback_rate = true;
           break;
