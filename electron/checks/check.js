@@ -1,10 +1,19 @@
-import { parse_details } from "../utils/detail_utils.js"
+import { parse_details, parse_title } from "../utils/check_utils.js";
 
 export class Check {
   constructor({ id, status, title, details, args }) {
     this.id = id;
     this.status = status;
-    this.title = title;
+    /**
+     * A title must be one of the following formats:
+     *
+     * 1. A string
+     * { title: "Audio must not be encoded upwards from a lower bitrate" }
+     *
+     * 2. An object made up of status keys and string values
+     * { title: { info: "Epilepsy warning is disabled", warning: "Epilepsy warning is enabled" } }
+     */
+    this.title = parse_title(title, status);
     /**
      * Details if provided must be one of the formats below and can declare args like %this
      *

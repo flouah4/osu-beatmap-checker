@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import os from "os";
 import { check_overencoded_audio } from "./audio_helper.js";
+import { check_samples_match_playback_rate } from "./hitsounds_helper.js";
 
 function get_osu_songs_path() {
   const home = os.homedir();
@@ -185,12 +186,10 @@ export async function check_beatmap_general(beatmap_folder_path) {
 
   const beatmap = await get_beatmap(beatmap_folder_path, beatmap_files);
 
-  const overencoded_audio_check = await check_overencoded_audio(
-    osu_files,
-    beatmap_folder_path
-  );
-
-  const checks = [overencoded_audio_check];
+  const checks = await Promise.all([
+    check_overencoded_audio(beatmap_folder_path, osu_files),
+    check_samples_match_playback_rate(beatmap_folder_path, osu_files),
+  ]);
 
   let general_status;
   if (checks.some((check) => check.status === "issue")) {

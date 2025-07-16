@@ -117,11 +117,12 @@ function get_expected_cutoff_frequency(header_bitrate) {
       return entry.cutoff_frequency;
     }
   }
-  return expected_bitrate_table[expected_bitrate_table.length - 1]
-    .cutoff_frequency;
+  const expected_cutoff_frequency =
+    expected_bitrate_table[expected_bitrate_table.length - 1].cutoff_frequency;
+  return expected_cutoff_frequency;
 }
 
-export async function check_overencoded_audio(osu_files, beatmap_folder_path) {
+export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
   let audio_file = null;
   for (const osu_file of osu_files) {
     let in_general = false;
@@ -159,12 +160,16 @@ export async function check_overencoded_audio(osu_files, beatmap_folder_path) {
   if (cutoff_frequency < expected_cutoff_frequency) {
     check = new OverencodedAudioCheck({
       status: "issue",
-      args: { header_bitrate, cutoff_frequency, expected_cutoff_frequency },
+      args: {
+        header_bitrate,
+        cutoff_frequency: cutoff_frequency / 10,
+        expected_cutoff_frequency: expected_cutoff_frequency / 10,
+      },
     });
   } else {
     check = new OverencodedAudioCheck({
       status: "ok",
-      args: { header_bitrate, cutoff_frequency },
+      args: { header_bitrate, cutoff_frequency: cutoff_frequency / 10 },
     });
   }
 

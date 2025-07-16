@@ -19,6 +19,7 @@ export enum CheckId {
 
 export enum CheckStatus {
   Ok = "ok",
+  Info = "info",
   Warning = "warning",
   Issue = "issue",
 }

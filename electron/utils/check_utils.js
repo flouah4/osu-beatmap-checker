@@ -1,3 +1,13 @@
+export function parse_title(title, status) {
+  if (typeof title === "object") {
+    if (!title[status]) {
+      throw new Error(`No title found for status ${status}`);
+    }
+    return title[status];
+  }
+  return title;
+}
+
 export function parse_details(details, args, status) {
   if (!details) {
     return [];
