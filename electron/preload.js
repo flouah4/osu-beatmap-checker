@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld("api", {
   },
   osu: {
     get_beatmaps: (search) => ipcRenderer.invoke("get_osu_beatmaps", search),
-    check_beatmap: (beatmap_id) => ipcRenderer.invoke("check_beatmap", beatmap_id),
+    check_beatmap_general: (beatmap_folder_path) => ipcRenderer.invoke("check_beatmap_general", beatmap_folder_path),
+    check_difficulty: (osu_file_path) => ipcRenderer.invoke("check_beatmap_general", osu_file_path),
   },
 });

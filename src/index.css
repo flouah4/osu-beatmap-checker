@@ -47,6 +47,13 @@ body {
   box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
 }
 
+.focused-neo-box {
+  border-width: 2px;
+  border-radius: 4px;
+  translate: 2px 2px;
+  box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
+}
+
 .scrollbar-hidden {
   &::-webkit-scrollbar {
     display: none;

@@ -1,11 +1,19 @@
 import { useBeatmap } from "../context/beatmap_context";
-import { CheckStatus, type ICheck } from "../types/check_interface";
-import okCheckSvg from "../assets/ok_check.svg";
-import warningCheckSvg from "../assets/warning_check.svg";
-import issueCheckSvg from "../assets/issue_check.svg";
+import { statusColor } from "../data/status_color";
+import type { IDifficulty } from "../types/difficulty_interface";
+import { Checks } from "./checks";
 
 export function Beatmap() {
-  const { beatmap, isLoading, generalStatus, checks } = useBeatmap();
+  const {
+    beatmap,
+    isLoadingGeneral,
+    generalStatus,
+    isSelectedGeneral,
+    generalChecks,
+    isLoadingDifficulty,
+    selectedDifficultyChecks,
+    getDifficultyGeneralStatus,
+  } = useBeatmap();
 
   if (!beatmap) {
     return (
@@ -13,7 +21,7 @@ export function Beatmap() {
         Select a beatmap
       </div>
     );
-  } else if (isLoading) {
+  } else if (isLoadingGeneral) {
     return (
       <div className="flex justify-center items-center p-4 w-full text-regular">
         Loading beatmap...
@@ -21,51 +29,43 @@ export function Beatmap() {
     );
   }
 
-  const statusColor = {
-    [CheckStatus.Ok]: "bg-neo-green",
-    [CheckStatus.Warning]: "bg-neo-yellow",
-    [CheckStatus.Issue]: "bg-neo-red",
-  };
-
   return (
-    <div className="flex flex-col w-full divide-y-4">
-      <div className="flex flex-col bg-neo-purple px-4 py-3">
+    <div className="flex flex-col w-full">
+      <div className="flex flex-col bg-neo-purple px-4 py-3 border-b-4">
         <p className="text-lead  text-center">
           {beatmap.artist} - {beatmap.title}
         </p>
         <p className="text-small text-center">mapped by {beatmap.creator}</p>
       </div>
-      <div className={`${statusColor[generalStatus]} px-4 py-2`}>
-        <p className="text-regular leading-[16px] text-center">General</p>
-      </div>
-      <div className="p-4">
-        {checks.map((check: ICheck, i: number) => (
-          <div key={i} className="flex gap-2.5">
-            <div
-              className={`${
-                statusColor[check.status]
-              } p-0.5 rounded-[4px] ring-2 ring-inset h-fit`}
-            >
-              {check.status === CheckStatus.Ok && (
-                <img src={okCheckSvg} alt="Ok" />
-              )}
-              {check.status === CheckStatus.Warning && (
-                <img src={warningCheckSvg} alt="Warning" />
-              )}
-              {check.status === CheckStatus.Issue && (
-                <img src={issueCheckSvg} alt="Issue" />
-              )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-regular">{check.title}</p>
-              {check.details.map((detail, i) => (
-                <p key={i} className="text-small">
-                  {detail}
-                </p>
-              ))}
-            </div>
+      <div className="flex flex-wrap border-b-2 divide-x-2">
+        <div
+          className={`${statusColor[generalStatus]} px-4 py-2 flex-1 border-b-2`}
+        >
+          <p className="text-regular leading-[16px] text-center">General</p>
+        </div>
+        {beatmap.difficulties.map((difficulty: IDifficulty, i: number) => (
+          <div
+            key={i}
+            className={`${
+              statusColor[getDifficultyGeneralStatus(difficulty.file_path)]
+            } px-4 py-2 flex-1 border-b-2 cursor-not-allowed hover:`}
+          >
+            <p className="text-regular leading-[16px] text-center min-w-max">
+              {difficulty.name}
+            </p>
           </div>
         ))}
+      </div>
+      <div className="p-4">
+        {isSelectedGeneral && <Checks checks={generalChecks} />}
+        {!isSelectedGeneral && !isLoadingDifficulty && (
+          <Checks checks={selectedDifficultyChecks} />
+        )}
+        {!isSelectedGeneral && isLoadingDifficulty && (
+          <div className="flex justify-center items-center text-regular">
+            Loading difficulty...
+          </div>
+        )}
       </div>
     </div>
   );

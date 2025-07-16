@@ -4,8 +4,10 @@ import FFT from "fft.js";
 import { spawn } from "child_process";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { parseFile } from "music-metadata";
+import { OverencodedAudioCheck } from "../checks/audio/overencoded_audio_check.js";
+import { MissingAudioCheck } from "../checks/audio/missing_audio_check.js";
 
-async function get_cutoff_bitrate(audio_path) {
+async function get_cutoff_frequency(audio_path) {
   // 1) spawn ffmpeg to decode to raw 32-bit float PCM, mono, 44.1 kHz
   const sample_rate = 44100;
   const ff = spawn(
@@ -101,22 +103,22 @@ async function get_header_bitrate(audio_path) {
   return metadata.format.bitrate / 1000;
 }
 
-function get_expected_cutoff_bitrate(header_bitrate) {
+function get_expected_cutoff_frequency(header_bitrate) {
   const expected_bitrate_table = [
-    { header_bitrate: 64, cutoff_bitrate: 80 },
-    { header_bitrate: 96, cutoff_bitrate: 120 },
-    { header_bitrate: 128, cutoff_bitrate: 150 },
-    { header_bitrate: 192, cutoff_bitrate: 180 },
-    { header_bitrate: 320, cutoff_bitrate: 200 },
+    { header_bitrate: 64, cutoff_frequency: 80 },
+    { header_bitrate: 96, cutoff_frequency: 120 },
+    { header_bitrate: 128, cutoff_frequency: 150 },
+    { header_bitrate: 192, cutoff_frequency: 180 },
+    { header_bitrate: 320, cutoff_frequency: 200 },
   ];
 
   for (const entry of expected_bitrate_table) {
     if (header_bitrate <= entry.header_bitrate) {
-      return entry.cutoff_bitrate;
+      return entry.cutoff_frequency;
     }
   }
   return expected_bitrate_table[expected_bitrate_table.length - 1]
-    .cutoff_bitrate;
+    .cutoff_frequency;
 }
 
 export async function check_overencoded_audio(osu_files, beatmap_folder_path) {
@@ -143,39 +145,29 @@ export async function check_overencoded_audio(osu_files, beatmap_folder_path) {
   }
 
   if (!audio_file) {
-    return {
-      id: "audio_missing",
-      status: "issue",
-      title: "Audio is missing",
-    };
+    return new MissingAudioCheck();
   }
 
   const audio_path = path.join(beatmap_folder_path, audio_file);
 
-  const cutoff_bitrate = await get_cutoff_bitrate(audio_path);
+  const cutoff_frequency = await get_cutoff_frequency(audio_path);
   const header_bitrate = await get_header_bitrate(audio_path);
+  const expected_cutoff_frequency =
+    get_expected_cutoff_frequency(header_bitrate);
 
-  const expected_cutoff_bitrate = get_expected_cutoff_bitrate(header_bitrate);
-  const check = {
-    id: "overencoded_audio",
-    status: "ok",
-    title: "Audio must not be encoded upwards from a lower bitrate",
-    details: [
-      `The audio is declared as ${header_bitrate} kbps with a cut-off at ${
-        cutoff_bitrate / 10
-      } kHz which means it's not overencoded.`,
-    ],
-  };
-  if (cutoff_bitrate < expected_cutoff_bitrate) {
-    check.status = "issue";
-    check.details = [
-      `The audio is declared as ${header_bitrate} kbps with a cut-off at ${
-        cutoff_bitrate / 10
-      } kHz when the expected cut-off for this bitrate is ${
-        expected_cutoff_bitrate / 10
-      } kHz. The audio must be encoded downwards to avoid file size bloat or it must be changed to a better version.`,
-    ];
+  let check;
+  if (cutoff_frequency < expected_cutoff_frequency) {
+    check = new OverencodedAudioCheck({
+      status: "issue",
+      args: { header_bitrate, cutoff_frequency, expected_cutoff_frequency },
+    });
+  } else {
+    check = new OverencodedAudioCheck({
+      status: "ok",
+      args: { header_bitrate, cutoff_frequency },
+    });
   }
+
   console.log("Checked overencoded audio", check);
   return check;
 }

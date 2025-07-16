@@ -1,7 +1,10 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
-import { check_beatmap, get_beatmaps } from "./helpers/beatmap_helper.js";
+import {
+  check_beatmap_general,
+  get_beatmaps,
+} from "./helpers/beatmap_helper.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,8 +34,11 @@ app.whenReady().then(() => {
   ipcMain.handle("get_osu_beatmaps", async (_, search) => {
     return await get_beatmaps(search);
   });
-  ipcMain.handle("check_beatmap", async (_, beatmap_id) => {
-    return await check_beatmap(beatmap_id);
+  ipcMain.handle("check_beatmap_general", async (_, beatmap_folder_path) => {
+    return await check_beatmap_general(beatmap_folder_path);
+  });
+  ipcMain.handle("check_difficulty", async (_, osu_file_path) => {
+    return await check_difficulty(osu_file_path);
   });
 });
 

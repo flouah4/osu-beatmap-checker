@@ -5,21 +5,19 @@ import type { IBeatmap } from "../types/beatmap_interface";
 
 export function Sidebar() {
   const [beatmaps, setBeatmaps] = useState<IBeatmap[]>([]);
+  const [clickedBeatmap, setClickedBeatmap] = useState<IBeatmap | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
   const [search, setSearch] = useState<string>("");
-  const { value } = useDebounce(search);
 
+  const { value } = useDebounce(search);
   const { selectBeatmap } = useBeatmap();
 
   useEffect(() => {
     setIsLoading(true);
-    (window as any).api.osu
-      .get_beatmaps(value)
-      .then((result: IBeatmap[]) => {
-        setIsLoading(false);
-        setBeatmaps(result);
-      });
+    (window as any).api.osu.get_beatmaps(value).then((result: IBeatmap[]) => {
+      setBeatmaps(result);
+      setIsLoading(false);
+    });
   }, [value]);
 
   useEffect(() => {
@@ -27,7 +25,7 @@ export function Sidebar() {
   }, [beatmaps]);
 
   return (
-    <div className="flex flex-col gap-4 border-r-4 p-4 max-w-[300px] overflow-auto scrollbar-hidden">
+    <div className="flex flex-col gap-4 border-r-4 p-4 min-w-[300px] max-w-[300px] overflow-auto scrollbar-hidden">
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -44,8 +42,15 @@ export function Sidebar() {
           beatmaps.map((beatmap, i) => (
             <div
               key={i}
-              onClick={() => selectBeatmap(beatmap.id)}
-              className="flex flex-col gap-1 bg-neo-blue neo-box px-4 py-2 cursor-pointer last:mb-14"
+              onClick={() => {
+                selectBeatmap(beatmap.folder_path);
+                setClickedBeatmap(beatmap);
+              }}
+              className={`${
+                beatmap.folder_path === clickedBeatmap?.folder_path
+                  ? "bg-neo-purple focused-neo-box cursor-default"
+                  : "bg-neo-blue neo-box cursor-pointer"
+              } flex flex-col gap-1 px-4 py-2 last:mb-14`}
             >
               <p className="text-regular leading-[16px] text-center">
                 {beatmap.artist} - {beatmap.title}

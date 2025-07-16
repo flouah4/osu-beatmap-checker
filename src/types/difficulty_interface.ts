@@ -1,4 +1,6 @@
 export interface IDifficulty {
-  id: number;
+  file_path: string;
   name: string;
 }
+
+export type DifficultyPath = IDifficulty["file_path"]

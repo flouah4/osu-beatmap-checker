@@ -16,6 +16,8 @@ function get_osu_songs_path() {
 }
 
 export async function get_beatmaps(search = "") {
+  /** Gets beatmaps excluding difficulties */
+
   console.log("Executing function (get_beatmaps)", search);
 
   const songs_path = get_osu_songs_path();
@@ -29,29 +31,26 @@ export async function get_beatmaps(search = "") {
           (!search || dirent.name.toLowerCase().includes(search.toLowerCase()))
       )
       .map(async (dirent) => {
-        const folder_path = path.join(songs_path, dirent.name);
-        const stats = await fs.stat(folder_path);
-        return { dirent, folder_path, added: stats.birthtime };
+        const beatmap_folder_path = path.join(songs_path, dirent.name);
+        const stats = await fs.stat(beatmap_folder_path);
+        return { beatmap_folder_path, creation_date: stats.birthtime };
       })
   );
 
-  const recent_maps = stats_list.sort((a, b) => b.added - a.added).slice(0, 20);
+  const recent_maps = stats_list
+    .sort((a, b) => b.creation_date - a.creation_date)
+    .slice(0, 20);
 
   const beatmaps = [];
-  for (const { dirent, folder_path } of recent_maps) {
-    const beatmap_id = +dirent.name.split(" ")[0];
-    if (isNaN(beatmap_id)) {
-      continue;
-    }
-
-    const beatmap_files = await fs.readdir(folder_path);
+  for (const { beatmap_folder_path } of recent_maps) {
+    const beatmap_files = await fs.readdir(beatmap_folder_path);
     const osu_file = beatmap_files.find((file) => file.endsWith(".osu"));
     if (!osu_file) {
       continue;
     }
 
     const lines = (
-      await fs.readFile(path.join(folder_path, osu_file), "utf8")
+      await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
     ).split(/\r?\n/);
 
     const metadata = {};
@@ -71,7 +70,7 @@ export async function get_beatmaps(search = "") {
     }
 
     beatmaps.push({
-      id: beatmap_id,
+      folder_path: beatmap_folder_path,
       artist: metadata.Artist,
       title: metadata.Title,
       creator: metadata.Creator,
@@ -87,6 +86,8 @@ export async function get_beatmaps(search = "") {
 }
 
 async function get_beatmap_difficulties(beatmap_folder_path, osu_files) {
+  /** Gets the difficulties of a beatmap */
+
   console.log("Executing function (get_beatmap_difficulties)", {
     beatmap_folder_path,
     osu_files,
@@ -95,12 +96,10 @@ async function get_beatmap_difficulties(beatmap_folder_path, osu_files) {
   const difficulties = [];
 
   for (const osu_file of osu_files) {
-    const lines = (
-      await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
-    ).split(/\r?\n/);
+    const file_path = path.join(beatmap_folder_path, osu_file);
+    const lines = (await fs.readFile(file_path, "utf8")).split(/\r?\n/);
 
     let in_metadata = false;
-    let id = null;
     let name = null;
 
     for (const line of lines) {
@@ -112,19 +111,16 @@ async function get_beatmap_difficulties(beatmap_folder_path, osu_files) {
         if (line.startsWith("[")) {
           break;
         }
-
         const [key, value] = line.split(":");
-
-        if (key === "BeatmapID") {
-          id = +value;
-        } else if (key === "Version") {
+        if (key === "Version") {
           name = value.trim();
+          break;
         }
       }
     }
 
-    if (id !== null && name !== null) {
-      difficulties.push({ id, name });
+    if (name) {
+      difficulties.push({ file_path, name });
     }
   }
 
@@ -132,6 +128,8 @@ async function get_beatmap_difficulties(beatmap_folder_path, osu_files) {
 }
 
 async function get_beatmap(beatmap_folder_path, beatmap_files) {
+  /** Gets a beatmap including difficulties */
+
   console.log("Executing function (get_beatmap)", {
     beatmap_folder_path,
     beatmap_files,
@@ -166,7 +164,7 @@ async function get_beatmap(beatmap_folder_path, beatmap_files) {
   );
 
   return {
-    id: +metadata.BeatmapSetID,
+    folder_path: beatmap_folder_path,
     artist: metadata.Artist,
     title: metadata.Title,
     creator: metadata.Creator,
@@ -174,16 +172,14 @@ async function get_beatmap(beatmap_folder_path, beatmap_files) {
   };
 }
 
-export async function check_beatmap(beatmap_id) {
-  console.log("Executing function (check_beatmap)", beatmap_id);
+export async function check_beatmap_general(beatmap_folder_path) {
+  /** Gets the beatmap and its difficulties and does general checks */
 
-  const songs_path = get_osu_songs_path();
-  const entries = await fs.readdir(songs_path, { withFileTypes: true });
-  const dirent = entries.find(
-    (e) => e.isDirectory() && e.name.split(" ")[0] === String(beatmap_id)
+  console.log(
+    "Executing function (check_beatmap_general)",
+    beatmap_folder_path
   );
 
-  const beatmap_folder_path = path.join(songs_path, dirent.name);
   const beatmap_files = await fs.readdir(beatmap_folder_path);
   const osu_files = beatmap_files.filter((f) => f.endsWith(".osu"));
 
@@ -196,5 +192,18 @@ export async function check_beatmap(beatmap_id) {
 
   const checks = [overencoded_audio_check];
 
-  return { beatmap, checks };
+  let general_status;
+  if (checks.some((check) => check.status === "issue")) {
+    general_status = "issue";
+  } else if (checks.some((check) => check.status === "warning")) {
+    general_status = "warning";
+  } else {
+    general_status = "ok";
+  }
+
+  return { beatmap, general_status, checks };
+}
+
+export async function check_beatmap_difficulty(osu_file_path) {
+  //
 }
