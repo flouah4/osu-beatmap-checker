@@ -4,6 +4,7 @@ import os from "os";
 import { check_overencoded_audio } from "./audio_helper.js";
 import { check_samples_match_playback_rate } from "./hitsounds_helper.js";
 import { check_epilepsy_warning } from "./storyboard_helper.js";
+import { check_video } from "./video_helper.js";
 
 function get_osu_songs_path() {
   const home = os.homedir();
@@ -187,11 +188,14 @@ export async function check_beatmap_general(beatmap_folder_path) {
 
   const beatmap = await get_beatmap(beatmap_folder_path, beatmap_files);
 
-  const checks = await Promise.all([
+  const result = await Promise.all([
     check_overencoded_audio(beatmap_folder_path, osu_files),
     check_samples_match_playback_rate(beatmap_folder_path, osu_files),
     check_epilepsy_warning(beatmap_folder_path, osu_files),
+    check_video(beatmap_folder_path, osu_files),
   ]);
+  /** Check functions can either return a check, an array of checks, or null */
+  const checks = result.filter((check) => check !== null).flat()
 
   const severity_order = ["issue", "warning", "ok", "info"];
   checks.sort(

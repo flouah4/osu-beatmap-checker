@@ -5,7 +5,6 @@ import { spawn } from "child_process";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { parseFile } from "music-metadata";
 import { OverencodedAudioCheck } from "../checks/audio/overencoded_audio_check.js";
-import { MissingAudioCheck } from "../checks/audio/missing_audio_check.js";
 
 async function get_cutoff_frequency(audio_path) {
   /** Gets the audio cutoff frequency like you would do in spek */
@@ -148,7 +147,7 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
   }
 
   if (!audio_file) {
-    return new MissingAudioCheck();
+    return null;
   }
 
   const audio_path = path.join(beatmap_folder_path, audio_file);

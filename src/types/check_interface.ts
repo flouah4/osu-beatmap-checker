@@ -1,20 +1,8 @@
 export interface ICheck {
-  id: CheckId;
+  id: string;
   status: CheckStatus;
   title: string;
   details: string[];
-}
-
-export enum CheckId {
-  MissingAudio = "missing_audio",
-  OverencodedAudio = "overencoded_audio",
-  SamplesMatchPlaybackRate = "samples_match_playback_rate",
-  EpilepsyWarning = "epilepsy_warning",
-  LetterboxDuringBreaks = "letterbox_during_breaks",
-  VideoEncoderH264 = "video_encoder_h264",
-  VideoDimensions1280x720 = "video_dimensions_1280x720",
-  VideoAudio = "video_audio",
-  WidescreenSupport = "widescreen_support",
 }
 
 export enum CheckStatus {
