@@ -124,6 +124,11 @@ function get_expected_cutoff_frequency(header_bitrate) {
 }
 
 export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
+  console.log(
+    "Executing function (check_overencoded_audio)",
+    beatmap_folder_path
+  );
+
   let audio_file = null;
   for (const osu_file of osu_files) {
     let in_general = false;
@@ -136,13 +141,18 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
         continue;
       }
       if (in_general) {
-        if (line.startsWith("[")) break;
+        if (line.startsWith("[")) {
+          break;
+        }
         const [key, value] = line.split(":");
         if (key === "AudioFilename") {
           audio_file = value.trim();
           break;
         }
       }
+    }
+    if (audio_file) {
+      break;
     }
   }
 
@@ -162,7 +172,7 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
     check = new OverencodedAudioCheck({
       status: "issue",
       args: {
-        header_bitrate,
+        header_bitrate: Math.floor(header_bitrate),
         cutoff_frequency: cutoff_frequency / 10,
         expected_cutoff_frequency: expected_cutoff_frequency / 10,
       },

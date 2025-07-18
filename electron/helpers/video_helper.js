@@ -7,11 +7,7 @@ import { VideoDimensionsCheck } from "../checks/video/video_dimensions_check.js"
 import { VideoEncoderCheck } from "../checks/video/video_encoder_check.js";
 
 export async function check_video(beatmap_folder_path, osu_files) {
-  console.log(
-    "Executing function (check_video)",
-    beatmap_folder_path,
-    osu_files
-  );
+  console.log("Executing function (check_video)", beatmap_folder_path);
 
   let video_file = null;
   for (const osu_file of osu_files) {
@@ -27,6 +23,9 @@ export async function check_video(beatmap_folder_path, osu_files) {
         }
         continue;
       }
+    }
+    if (video_file) {
+      break;
     }
   }
 

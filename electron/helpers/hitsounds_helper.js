@@ -8,8 +8,7 @@ export async function check_samples_match_playback_rate(
 ) {
   console.log(
     "Executing function (check_samples_match_playback_rate)",
-    beatmap_folder_path,
-    osu_files
+    beatmap_folder_path
   );
 
   let samples_match_playback_rate = false;
@@ -26,6 +25,9 @@ export async function check_samples_match_playback_rate(
         }
         continue;
       }
+    }
+    if (samples_match_playback_rate) {
+      break;
     }
   }
 

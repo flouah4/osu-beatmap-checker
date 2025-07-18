@@ -21,7 +21,7 @@ export function parse_details(details, args, status) {
   } else if (typeof details === "object") {
     parsed_details = details[status];
     if (!parsed_details) {
-      throw new Error(`No details found for status (${status})`);
+      return [];
     } else if (typeof parsed_details === "string") {
       parsed_details = [parsed_details];
     }

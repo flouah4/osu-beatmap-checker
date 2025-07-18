@@ -3,8 +3,13 @@ import path from "path";
 import os from "os";
 import { check_overencoded_audio } from "./audio_helper.js";
 import { check_samples_match_playback_rate } from "./hitsounds_helper.js";
-import { check_epilepsy_warning } from "./storyboard_helper.js";
+import {
+  check_epilepsy_warning,
+  check_letterbox_during_breaks,
+  check_widescreen_support,
+} from "./storyboard_helper.js";
 import { check_video } from "./video_helper.js";
+import { check_duplicated_background } from "./background_helper.js";
 
 function get_osu_songs_path() {
   const home = os.homedir();
@@ -184,7 +189,7 @@ export async function check_beatmap_general(beatmap_folder_path) {
   );
 
   const beatmap_files = await fs.readdir(beatmap_folder_path);
-  const osu_files = beatmap_files.filter((f) => f.endsWith(".osu"));
+  const osu_files = beatmap_files.filter((file) => file.endsWith(".osu"));
 
   const beatmap = await get_beatmap(beatmap_folder_path, beatmap_files);
 
@@ -192,10 +197,13 @@ export async function check_beatmap_general(beatmap_folder_path) {
     check_overencoded_audio(beatmap_folder_path, osu_files),
     check_samples_match_playback_rate(beatmap_folder_path, osu_files),
     check_epilepsy_warning(beatmap_folder_path, osu_files),
+    check_letterbox_during_breaks(beatmap_folder_path, osu_files),
     check_video(beatmap_folder_path, osu_files),
+    check_duplicated_background(beatmap_folder_path, osu_files),
+    check_widescreen_support(beatmap_folder_path, osu_files, beatmap_files),
   ]);
   /** Check functions can either return a check, an array of checks, or null */
-  const checks = result.filter((check) => check !== null).flat()
+  const checks = result.filter((check) => check !== null).flat();
 
   const severity_order = ["issue", "warning", "ok", "info"];
   checks.sort(

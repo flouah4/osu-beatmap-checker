@@ -16,6 +16,7 @@
     "@ffprobe-installer/ffprobe": "^2.1.2",
     "@tailwindcss/vite": "^4.1.11",
     "fft.js": "^4.0.4",
+    "imghash": "^1.0.0",
     "music-metadata": "^11.6.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
