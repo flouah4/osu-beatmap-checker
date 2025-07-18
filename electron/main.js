@@ -1,9 +1,10 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import {
-  check_beatmap_general,
   get_beatmaps,
+  check_beatmap_general,
+  check_beatmap_difficulty,
 } from "./helpers/beatmap_helper.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,7 +27,11 @@ app.whenReady().then(() => {
     },
   });
 
-  win.loadURL("http://localhost:5173");
+  if (app.isPackaged) {
+    win.loadFile(path.join(__dirname, "..", "dist", "index.html"));
+  } else {
+    win.loadURL("http://localhost:5173");
+  }
 
   ipcMain.on("minimize_window", () => win.minimize());
   ipcMain.on("close_window", () => win.close());
@@ -37,8 +42,8 @@ app.whenReady().then(() => {
   ipcMain.handle("check_beatmap_general", async (_, beatmap_folder_path) => {
     return await check_beatmap_general(beatmap_folder_path);
   });
-  ipcMain.handle("check_difficulty", async (_, osu_file_path) => {
-    return await check_difficulty(osu_file_path);
+  ipcMain.handle("check_beatmap_difficulty", async (_, osu_file_path) => {
+    return await check_beatmap_difficulty(osu_file_path);
   });
 });
 

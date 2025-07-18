@@ -105,7 +105,7 @@ export function BeatmapProvider({ children }) {
     setIsSelectedGeneral(false);
 
     (window as any).api.osu
-      .check_difficulty(osuFilePath)
+      .check_beatmap_difficulty(osuFilePath)
       .then(
         ({
           general_status,

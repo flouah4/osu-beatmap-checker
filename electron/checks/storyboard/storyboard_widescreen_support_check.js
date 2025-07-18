@@ -7,4 +7,8 @@ export const StoryboardWidescreenSupportCheck = Check.create({
     info: "Widescreen support is enabled",
     warning: "Widescreen support is disabled",
   },
+  details: {
+    warning:
+      "The widescreen support is disabled although the map has a storyboard.",
+  },
 });

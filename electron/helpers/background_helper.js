@@ -111,7 +111,7 @@ export async function check_duplicated_background(
   let check;
   if (duplicated_relative_paths.length >= 1) {
     check = new DuplicatedBackgroundCheck({
-      status: "issue",
+      status: "warning",
       args: {
         duplicated_background_path: duplicated_relative_paths
           .map((p) => `"${p}"`)

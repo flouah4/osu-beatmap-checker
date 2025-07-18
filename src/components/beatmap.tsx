@@ -15,7 +15,7 @@ export function Beatmap() {
     getDifficultyGeneralStatus,
   } = useBeatmap();
 
-  if (!beatmap) {
+  if (!beatmap && !isLoadingGeneral) {
     return (
       <div className="flex justify-center items-center p-4 w-full text-regular">
         Select a beatmap

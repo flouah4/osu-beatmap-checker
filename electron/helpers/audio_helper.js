@@ -81,7 +81,7 @@ async function get_cutoff_frequency(audio_path) {
     if (mag > peak_mag) peak_mag = mag;
   }
 
-  const threshold = peak_mag * 0.001; // e.g. 0.1% of peak
+  const threshold = peak_mag * 0.00001; // e.g. 0.1% of peak
   for (let i = 0; i < half; i++) {
     const re = complex_out[2 * i];
     const im = complex_out[2 * i + 1];
@@ -106,10 +106,8 @@ async function get_header_bitrate(audio_path) {
 
 function get_expected_cutoff_frequency(header_bitrate) {
   const expected_bitrate_table = [
-    { header_bitrate: 64, cutoff_frequency: 80 },
-    { header_bitrate: 96, cutoff_frequency: 120 },
     { header_bitrate: 128, cutoff_frequency: 150 },
-    { header_bitrate: 192, cutoff_frequency: 180 },
+    { header_bitrate: 192, cutoff_frequency: 175 },
     { header_bitrate: 320, cutoff_frequency: 200 },
   ];
 
