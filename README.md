@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Beatmap Checker</h1>
-	<img src="electron/assets/icon.ico" loading="eager" width="64" height="64" alt="icon"/>
+	<img src="electron/assets/icon.ico" loading="eager" width="128" height="128" alt="icon"/>
 	<p>A tool to check osu! beatmaps</p>
 </div>
 
