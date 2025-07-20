@@ -1,6 +1,8 @@
 import { Check } from "../check.js";
 
 export const VideoAudioCheck = Check.create({
-  id: "video_audio",
-  title: "Video doesn't have audio",
+  title: {
+    ok: "Video does not have audio",
+    issue: "Video has an audio track",
+  },
 });

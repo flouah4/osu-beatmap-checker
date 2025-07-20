@@ -1,33 +1,23 @@
 import fs from "fs/promises";
-import path from "path";
 import { SamplesMatchPlaybackRateCheck } from "../checks/hitsounds/samples_match_playback_rate_check.js";
 
-export async function check_samples_match_playback_rate(
-  beatmap_folder_path,
-  osu_files
-) {
+export async function check_samples_match_playback_rate(osu_file_path) {
   console.log(
     "Executing function (check_samples_match_playback_rate)",
-    beatmap_folder_path
+    osu_file_path
   );
 
   let samples_match_playback_rate = false;
-  for (const osu_file of osu_files) {
-    const lines = (
-      await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
-    ).split(/\r?\n/);
-    for (const line of lines) {
-      if (line.startsWith("SamplesMatchPlaybackRate")) {
-        const [, value] = line.split(":");
-        if (value.trim() === "1") {
-          samples_match_playback_rate = true;
-          break;
-        }
-        continue;
+  const lines = (
+    await fs.readFile(osu_file_path, "utf8")
+  ).split(/\r?\n/);
+  for (const line of lines) {
+    if (line.startsWith("SamplesMatchPlaybackRate")) {
+      const [, value] = line.split(":");
+      if (value.trim() === "1") {
+        samples_match_playback_rate = true;
+        break;
       }
-    }
-    if (samples_match_playback_rate) {
-      break;
     }
   }
 

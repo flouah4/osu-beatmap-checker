@@ -5,20 +5,23 @@ import ffprobe from "@ffprobe-installer/ffprobe";
 import { VideoAudioCheck } from "../checks/video/video_audio_check.js";
 import { VideoDimensionsCheck } from "../checks/video/video_dimensions_check.js";
 import { VideoEncoderCheck } from "../checks/video/video_encoder_check.js";
+import { VideoOffsetCheck } from "../checks/video/video_offset_check.js";
 
 export async function check_video(beatmap_folder_path, osu_files) {
   console.log("Executing function (check_video)", beatmap_folder_path);
 
   let video_file = null;
+  let video_offset = null;
   for (const osu_file of osu_files) {
     const lines = (
       await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
     ).split(/\r?\n/);
     for (const line of lines) {
       if (line.startsWith("Video")) {
-        const [, , value] = line.split(",");
+        const [, offset, value] = line.split(",");
         if (value) {
           video_file = value.trim().slice(1, -1);
+          video_offset = +offset;
           break;
         }
         continue;
@@ -34,7 +37,7 @@ export async function check_video(beatmap_folder_path, osu_files) {
   }
   const video_path = path.join(beatmap_folder_path, video_file);
 
-  const metadata = await new Promise((resolve, reject) => {
+  const video_metadata = await new Promise((resolve, reject) => {
     const proc = spawn(ffprobe.path, [
       "-v",
       "error",
@@ -60,14 +63,14 @@ export async function check_video(beatmap_folder_path, osu_files) {
     });
   });
 
-  const streams = metadata.streams || [];
+  const streams = video_metadata.streams || [];
   const video_stream = streams.find((s) => s.codec_type === "video") || {};
   const audio_stream = streams.find((s) => s.codec_type === "audio");
 
   const codec = video_stream.codec_name;
   const width = video_stream.width;
   const height = video_stream.height;
-  const has_audio = !!audio_stream;
+  const exists_audio = !!audio_stream;
 
   const checks = [];
   if (codec !== "h264") {
@@ -82,10 +85,16 @@ export async function check_video(beatmap_folder_path, osu_files) {
     checks.push(new VideoDimensionsCheck({ status: "ok" }));
   }
 
-  if (has_audio) {
+  if (exists_audio) {
     checks.push(new VideoAudioCheck({ status: "issue" }));
   } else {
     checks.push(new VideoAudioCheck({ status: "ok" }));
+  }
+
+  if (video_offset === 0) {
+    checks.push(new VideoOffsetCheck({ status: "warning" }));
+  } else {
+    checks.push(new VideoOffsetCheck({ status: "info" }));
   }
 
   console.log("Checked video", checks);

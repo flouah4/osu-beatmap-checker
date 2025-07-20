@@ -168,17 +168,19 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
   let check;
   if (cutoff_frequency < expected_cutoff_frequency) {
     check = new OverencodedAudioCheck({
-      status: "issue",
+      status: "warning",
       args: {
         header_bitrate: Math.floor(header_bitrate),
         cutoff_frequency: cutoff_frequency / 10,
-        expected_cutoff_frequency: expected_cutoff_frequency / 10,
       },
     });
   } else {
     check = new OverencodedAudioCheck({
       status: "ok",
-      args: { header_bitrate, cutoff_frequency: cutoff_frequency / 10 },
+      args: {
+        header_bitrate: Math.floor(header_bitrate),
+        cutoff_frequency: cutoff_frequency / 10,
+      },
     });
   }
 

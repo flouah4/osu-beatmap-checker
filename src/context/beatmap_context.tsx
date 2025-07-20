@@ -64,6 +64,7 @@ export function BeatmapProvider({ children }) {
 
   function selectGeneral() {
     setIsSelectedGeneral(true);
+    setSelectedDifficulty(null);
   }
 
   function selectBeatmap(beatmapFolderPath: BeatmapPath) {
@@ -73,6 +74,8 @@ export function BeatmapProvider({ children }) {
 
     setIsLoadingGeneral(true);
     setIsSelectedGeneral(true);
+    setSelectedDifficulty(null);
+    setDifficultyChecks({});
 
     (window as any).api.osu
       .check_beatmap_general(beatmapFolderPath)
@@ -90,7 +93,6 @@ export function BeatmapProvider({ children }) {
           setGeneralStatus(general_status);
           setGeneralChecks(checks);
           setIsLoadingGeneral(false);
-          console.log("the checks:", checks);
         }
       );
   }
@@ -105,7 +107,7 @@ export function BeatmapProvider({ children }) {
     setIsSelectedGeneral(false);
 
     (window as any).api.osu
-      .check_beatmap_difficulty(osuFilePath)
+      .check_beatmap_difficulty(beatmap.folder_path, osuFilePath)
       .then(
         ({
           general_status,

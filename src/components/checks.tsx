@@ -1,10 +1,19 @@
+import { useSettings } from "../context/settings_context";
 import { checkSvg } from "../data/check_svg";
-import type { ICheck } from "../types/check_interface";
+import { CheckStatus, type ICheck } from "../types/check_interface";
 
 export function Checks({ checks }: { checks: ICheck[] }) {
+  const { showOkChecks } = useSettings();
+
+  const notOkChecks = checks.filter(
+    (check) =>
+      check.status === CheckStatus.Warning || check.status === CheckStatus.Issue
+  );
+  const checksToDisplay = showOkChecks ? checks : notOkChecks;
+
   return (
     <div className="flex flex-col gap-2">
-      {checks.map((check: ICheck, i: number) => (
+      {checksToDisplay.map((check, i) => (
         <div key={i} className="flex gap-2.5">
           <div className="min-w-5 min-h-5">
             <img src={checkSvg[check.status]} />

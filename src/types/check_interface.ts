@@ -1,5 +1,4 @@
 export interface ICheck {
-  id: string;
   status: CheckStatus;
   title: string;
   details: string[];

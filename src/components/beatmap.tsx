@@ -9,10 +9,14 @@ export function Beatmap() {
     isLoadingGeneral,
     generalStatus,
     isSelectedGeneral,
+    selectGeneral,
     generalChecks,
     isLoadingDifficulty,
-    selectedDifficultyChecks,
     getDifficultyGeneralStatus,
+    selectDifficulty,
+    isDifficultySelected,
+    getDifficultyChecks,
+    selectedDifficulty,
   } = useBeatmap();
 
   if (!beatmap && !isLoadingGeneral) {
@@ -39,16 +43,28 @@ export function Beatmap() {
       </div>
       <div className="flex flex-wrap border-b-2 divide-x-2">
         <div
-          className={`${statusColor[generalStatus]} px-4 py-2 flex-1 border-b-2`}
+          onClick={selectGeneral}
+          className={`${
+            isSelectedGeneral
+              ? "bg-neo-purple cursor-default"
+              : `${statusColor[generalStatus]} cursor-pointer`
+          } px-4 py-2 flex-1 border-b-2`}
         >
           <p className="text-regular leading-[16px] text-center">General</p>
         </div>
         {beatmap.difficulties.map((difficulty: IDifficulty, i: number) => (
           <div
             key={i}
+            onClick={() => selectDifficulty(difficulty.file_path)}
             className={`${
-              statusColor[getDifficultyGeneralStatus(difficulty.file_path)]
-            } px-4 py-2 flex-1 border-b-2 cursor-not-allowed hover:`}
+              isDifficultySelected(difficulty.file_path)
+                ? "bg-neo-purple cursor-default"
+                : `${
+                    statusColor[
+                      getDifficultyGeneralStatus(difficulty.file_path)
+                    ]
+                  } cursor-pointer`
+            } px-4 py-2 flex-1 border-b-2`}
           >
             <p className="text-regular leading-[16px] text-center min-w-max">
               {difficulty.name}
@@ -56,13 +72,13 @@ export function Beatmap() {
           </div>
         ))}
       </div>
-      <div className="p-4">
+      <div className="p-4 h-full">
         {isSelectedGeneral && <Checks checks={generalChecks} />}
-        {!isSelectedGeneral && !isLoadingDifficulty && (
-          <Checks checks={selectedDifficultyChecks} />
+        {!isSelectedGeneral && selectedDifficulty && !isLoadingDifficulty && (
+          <Checks checks={getDifficultyChecks(selectedDifficulty)} />
         )}
         {!isSelectedGeneral && isLoadingDifficulty && (
-          <div className="flex justify-center items-center text-regular">
+          <div className="flex justify-center items-center text-regular h-full">
             Loading difficulty...
           </div>
         )}

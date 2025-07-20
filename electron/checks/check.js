@@ -1,8 +1,7 @@
 import { parse_details, parse_title } from "../utils/check_utils.js";
 
 export class Check {
-  constructor({ id, status, title, details, args }) {
-    this.id = id;
+  constructor({ status, title, details, args }) {
     this.status = status;
     /**
      * A title must be one of the following formats:
@@ -29,19 +28,19 @@ export class Check {
     this.details = parse_details(details, args, status);
   }
 
-  static create({ id, status, title, details = [] }) {
+  static create({ status, title, details = [] }) {
     if (status) {
       /** Allows the subclass to define their status */
       return class extends Check {
         constructor({ args = {} }) {
-          super({ id, status, title, details, args });
+          super({ status, title, details, args });
         }
       };
     } else {
       /** Allows the subclass to be instantiated with any status */
       return class extends Check {
         constructor({ status, args = {} }) {
-          super({ id, status, title, details, args });
+          super({ status, title, details, args });
         }
       };
     }

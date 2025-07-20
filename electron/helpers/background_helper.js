@@ -113,7 +113,7 @@ export async function check_duplicated_background(
     check = new DuplicatedBackgroundCheck({
       status: "warning",
       args: {
-        duplicated_background_path: duplicated_relative_paths
+        duplicated_background_paths: duplicated_relative_paths
           .map((p) => `"${p}"`)
           .join(", "),
       },

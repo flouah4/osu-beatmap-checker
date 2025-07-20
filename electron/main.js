@@ -42,9 +42,12 @@ app.whenReady().then(() => {
   ipcMain.handle("check_beatmap_general", async (_, beatmap_folder_path) => {
     return await check_beatmap_general(beatmap_folder_path);
   });
-  ipcMain.handle("check_beatmap_difficulty", async (_, osu_file_path) => {
-    return await check_beatmap_difficulty(osu_file_path);
-  });
+  ipcMain.handle(
+    "check_beatmap_difficulty",
+    async (_, beatmap_folder_path, osu_file_path) => {
+      return await check_beatmap_difficulty(beatmap_folder_path, osu_file_path);
+    }
+  );
 });
 
 app.on("window-all-closed", () => {

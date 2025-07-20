@@ -10,6 +10,11 @@ import {
 } from "./storyboard_helper.js";
 import { check_video } from "./video_helper.js";
 import { check_duplicated_background } from "./background_helper.js";
+import { check_combo_colors, check_preferred_skin } from "./skin_helper.js";
+import {
+  check_disallowed_artist,
+  check_missing_source,
+} from "./metadata_helper.js";
 
 function get_osu_songs_path() {
   const home = os.homedir();
@@ -176,6 +181,8 @@ async function get_beatmap(beatmap_folder_path, beatmap_files) {
     artist: metadata.Artist,
     title: metadata.Title,
     creator: metadata.Creator,
+    source: metadata.Source,
+    tags: metadata.Tags,
     difficulties,
   };
 }
@@ -195,17 +202,15 @@ export async function check_beatmap_general(beatmap_folder_path) {
 
   const result = await Promise.all([
     check_overencoded_audio(beatmap_folder_path, osu_files),
-    check_samples_match_playback_rate(beatmap_folder_path, osu_files),
-    check_epilepsy_warning(beatmap_folder_path, osu_files),
-    check_letterbox_during_breaks(beatmap_folder_path, osu_files),
     check_video(beatmap_folder_path, osu_files),
     check_duplicated_background(beatmap_folder_path, osu_files),
-    check_widescreen_support(beatmap_folder_path, osu_files, beatmap_files),
+    check_disallowed_artist(beatmap.artist, beatmap.source, beatmap.tags),
+    check_missing_source(beatmap.title, beatmap.source),
   ]);
   /** Check functions can either return a check, an array of checks, or null */
   const checks = result.filter((check) => check !== null).flat();
 
-  const severity_order = ["issue", "warning", "ok", "info"];
+  const severity_order = ["issue", "warning", "info", "ok"];
   checks.sort(
     (a, b) =>
       severity_order.indexOf(a.status) - severity_order.indexOf(b.status)
@@ -223,6 +228,41 @@ export async function check_beatmap_general(beatmap_folder_path) {
   return { beatmap, general_status, checks };
 }
 
-export async function check_beatmap_difficulty(osu_file_path) {
-  //
+export async function check_beatmap_difficulty(
+  beatmap_folder_path,
+  osu_file_path
+) {
+  /** Checks the difficulty of a beatmap */
+
+  console.log("Executing function (check_beatmap_difficulty)", osu_file_path);
+
+  const beatmap_files = await fs.readdir(beatmap_folder_path);
+
+  const result = await Promise.all([
+    check_epilepsy_warning(osu_file_path, beatmap_files),
+    check_widescreen_support(osu_file_path, beatmap_files),
+    check_letterbox_during_breaks(osu_file_path, beatmap_files),
+    check_samples_match_playback_rate(osu_file_path),
+    check_preferred_skin(osu_file_path),
+    check_combo_colors(osu_file_path),
+  ]);
+  /** Check functions can either return a check, an array of checks, or null */
+  const checks = result.filter((check) => check !== null).flat();
+
+  const severity_order = ["issue", "warning", "info", "ok"];
+  checks.sort(
+    (a, b) =>
+      severity_order.indexOf(a.status) - severity_order.indexOf(b.status)
+  );
+
+  let general_status;
+  if (checks.some((check) => check.status === "issue")) {
+    general_status = "issue";
+  } else if (checks.some((check) => check.status === "warning")) {
+    general_status = "warning";
+  } else {
+    general_status = "ok";
+  }
+
+  return { general_status, checks };
 }
