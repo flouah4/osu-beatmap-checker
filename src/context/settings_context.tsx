@@ -8,17 +8,16 @@ export function useSettings() {
 
 export function SettingsProvider({ children }) {
   const [showOkChecks, setShowOkChecks] = useState<boolean>(
-    // localStorage.getItem("show_ok_checks") === "true"
-    true
+    localStorage.getItem("show_ok_checks") === "true"
   );
 
-  function toggleSetShowOkChecks() {
+  function toggleShowOkChecks() {
     localStorage.setItem("show_ok_checks", showOkChecks ? "false" : "true");
     setShowOkChecks((prev) => !prev);
   }
 
   return (
-    <SettingsContext.Provider value={{ showOkChecks, toggleSetShowOkChecks }}>
+    <SettingsContext.Provider value={{ showOkChecks, toggleShowOkChecks }}>
       {children}
     </SettingsContext.Provider>
   );

@@ -1,6 +1,16 @@
 import { APP_VERSION } from "../data/version";
+import settingsSvg from "../assets/settings.svg";
+import minusSvg from "../assets/minus.svg";
+import xSvg from "../assets/x.svg";
+import { useModal } from "../context/modal_context";
+import { SettingsModal } from "../components/modals/settings_modal";
 
 export function Topbar() {
+  const { setModal } = useModal();
+
+  function openSettingsModal() {
+    setModal(<SettingsModal />);
+  }
   function openUrl(url: string) {
     (window as any).api.link.open(url);
   }
@@ -27,51 +37,28 @@ export function Topbar() {
         <p className="text-small-bold">{APP_VERSION}</p>
       </div>
       <div
+        onClick={openSettingsModal}
+        className="bg-neo-green px-4 flex items-center justify-center cursor-pointer"
+      >
+        <div className="min-w-6 min-h-6">
+          <img src={settingsSvg} />
+        </div>
+      </div>
+      <div
         onClick={minimize}
         className="bg-neo-yellow px-4 flex items-center justify-center cursor-pointer"
       >
-        <svg
-          width="24"
-          height="25"
-          viewBox="0 0 24 25"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M5 12.5H19"
-            stroke="#614054"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <div className="min-w-6 min-h-6">
+          <img src={minusSvg} />
+        </div>
       </div>
       <div
         onClick={close}
         className="bg-neo-red px-4 flex items-center justify-center cursor-pointer"
       >
-        <svg
-          width="24"
-          height="25"
-          viewBox="0 0 24 25"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18 6.5L6 18.5"
-            stroke="#614054"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M6 6.5L18 18.5"
-            stroke="#614054"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <div className="min-w-6 min-h-6">
+          <img src={xSvg} />
+        </div>
       </div>
     </div>
   );

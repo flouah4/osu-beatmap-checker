@@ -3,11 +3,14 @@ import "./index.css";
 import { App } from "./app";
 import { BeatmapProvider } from "./context/beatmap_context";
 import { SettingsProvider } from "./context/settings_context";
+import { ModalProvider } from "./context/modal_context";
 
 createRoot(document.getElementById("root")!).render(
   <SettingsProvider>
     <BeatmapProvider>
-      <App />
+      <ModalProvider>
+        <App />
+      </ModalProvider>
     </BeatmapProvider>
   </SettingsProvider>
 );

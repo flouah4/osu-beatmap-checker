@@ -49,7 +49,7 @@ export function Sidebar() {
               className={`${
                 beatmap.folder_path === clickedBeatmap?.folder_path
                   ? "bg-neo-purple focused-neo-box cursor-default"
-                  : "bg-neo-blue neo-box cursor-pointer"
+                  : "bg-neo-blue hoverable-neo-box cursor-pointer"
               } flex flex-col gap-1 px-4 py-2 last:mb-14`}
             >
               <p className="text-regular leading-[16px] text-center">

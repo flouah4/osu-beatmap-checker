@@ -42,7 +42,19 @@ body {
   border-radius: 4px;
 }
 
-.neo-box:hover {
+.big-neo-box {
+  box-shadow: 4px 4px 0px 0px var(--color-dark-neo-purple);
+  border-width: 4px;
+  border-radius: 8px;
+}
+
+.hoverable-neo-box {
+  box-shadow: 2px 2px 0px 0px var(--color-dark-neo-purple);
+  border-width: 2px;
+  border-radius: 4px;
+}
+
+.hoverable-neo-box:hover {
   translate: 2px 2px;
   box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
 }
