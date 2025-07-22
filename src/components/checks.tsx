@@ -1,6 +1,7 @@
 import { useSettings } from "../context/settings_context";
 import { checkSvg } from "../data/check_svg";
 import { CheckStatus, type ICheck } from "../types/check_interface";
+import Detail from "./detail";
 
 export function Checks({ checks }: { checks: ICheck[] }) {
   const { showOkChecks } = useSettings();
@@ -21,9 +22,7 @@ export function Checks({ checks }: { checks: ICheck[] }) {
           <div className="flex flex-col gap-1">
             <p className="text-regular">{check.title}</p>
             {check.details.map((detail, i) => (
-              <p key={i} className="text-small">
-                {detail}
-              </p>
+              <Detail key={i} text={detail} />
             ))}
           </div>
         </div>

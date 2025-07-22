@@ -9,3 +9,4 @@ export interface IBeatmap {
 }
 
 export type BeatmapPath = IBeatmap["folder_path"];
+export type BeatmapWithoutDifficulties = Omit<IBeatmap, "difficulties">;

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDebounce } from "../hooks/use_debounce";
 import { useBeatmap } from "../context/beatmap_context";
-import type { IBeatmap } from "../types/beatmap_interface";
+import { type BeatmapWithoutDifficulties } from "../types/beatmap_interface";
 
 export function Sidebar() {
-  const [beatmaps, setBeatmaps] = useState<IBeatmap[]>([]);
-  const [clickedBeatmap, setClickedBeatmap] = useState<IBeatmap | null>(null);
+  const [beatmaps, setBeatmaps] = useState<BeatmapWithoutDifficulties[]>([]);
+  const [clickedBeatmap, setClickedBeatmap] =
+    useState<BeatmapWithoutDifficulties | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
 
@@ -14,10 +15,12 @@ export function Sidebar() {
 
   useEffect(() => {
     setIsLoading(true);
-    (window as any).api.osu.get_beatmaps(value).then((result: IBeatmap[]) => {
-      setBeatmaps(result);
-      setIsLoading(false);
-    });
+    (window as any).api.osu
+      .get_beatmaps(value)
+      .then((result: BeatmapWithoutDifficulties[]) => {
+        setBeatmaps(result);
+        setIsLoading(false);
+      });
   }, [value]);
 
   useEffect(() => {

@@ -1,14 +1,22 @@
-export function parse_title(title, status) {
+export function parse_title(title, status, args) {
+  let parsed_title = title;
   if (typeof title === "object") {
     if (!title[status]) {
       throw new Error(`No title found for status ${status}`);
     }
-    return title[status];
+    parsed_title = title[status];
   }
-  return title;
+
+  parsed_title = parsed_title.replace(/%(\w+)/g, (_, arg) => {
+    if (!(arg in args)) {
+      throw new Error(`Missing argument (${arg})`);
+    }
+    return args[arg];
+  });
+  return parsed_title;
 }
 
-export function parse_details(details, args, status) {
+export function parse_details(details, status, args) {
   if (!details) {
     return [];
   }

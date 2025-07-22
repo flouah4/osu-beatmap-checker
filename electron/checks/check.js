@@ -2,6 +2,14 @@ import { parse_details, parse_title } from "../utils/check_utils.js";
 
 export class Check {
   constructor({ status, title, details, args }) {
+    /**
+     * The status must be one of these:
+     * 
+     * 1. ok
+     * 2. info
+     * 3. warning
+     * 4. issue
+     */
     this.status = status;
     /**
      * A title must be one of the following formats:
@@ -12,7 +20,7 @@ export class Check {
      * 2. An object made up of status keys and string values
      * { title: { info: "Epilepsy warning is disabled", warning: "Epilepsy warning is enabled" } }
      */
-    this.title = parse_title(title, status);
+    this.title = parse_title(title, status, args);
     /**
      * Details if provided must be one of the formats below and can declare args like %this
      *
@@ -24,8 +32,10 @@ export class Check {
      *
      * 3. An object made up of status keys and string or array of strings values
      * { details: { ok: "Everything went smooth", issue: ["You may need to check your %source"] } }
+     * 
+     * Details can also include timestamps written in this format: [timestamp:32154,312]
      */
-    this.details = parse_details(details, args, status);
+    this.details = parse_details(details, status, args);
   }
 
   static create({ status, title, details = [] }) {

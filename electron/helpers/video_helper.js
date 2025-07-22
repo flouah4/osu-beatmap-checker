@@ -53,7 +53,7 @@ export async function check_video(beatmap_folder_path, osu_files) {
     proc.on("error", reject);
     proc.on("close", (code) => {
       if (code !== 0) {
-        return reject(new Error(`ffprobe exited ${code}`));
+        return null;
       }
       try {
         resolve(JSON.parse(output));
