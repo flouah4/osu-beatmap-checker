@@ -15,7 +15,10 @@ import {
   check_disallowed_artist,
   check_missing_source,
 } from "./metadata_helper.js";
-import { check_multiple_reverses } from "./standard_helper.js";
+import {
+  check_difficulty_settings,
+  check_multiple_reverses,
+} from "./standard_helper.js";
 
 function get_osu_songs_path() {
   const home = os.homedir();
@@ -247,6 +250,7 @@ export async function check_beatmap_difficulty(
     check_preferred_skin(osu_file_path),
     check_combo_colors(osu_file_path),
     check_multiple_reverses(osu_file_path),
+    check_difficulty_settings(osu_file_path),
   ]);
   /** Check functions can either return a check, an array of checks, or null */
   const checks = result.filter((check) => check !== null).flat();

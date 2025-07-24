@@ -42,7 +42,7 @@ export default function Detail({ text }: { text: string }) {
 
     return (
       <a key={i} href={link} className="text-small-bold flex">
-        <div className="hoverable-neo-box px-1 bg-neo-blue">
+        <div className="hoverable-neo-box px-1 bg-neo-blue mr-0.5">
           {formatted + coordText}
         </div>
       </a>

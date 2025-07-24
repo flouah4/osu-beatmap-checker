@@ -72,7 +72,7 @@ export function Beatmap() {
           </div>
         ))}
       </div>
-      <div className="p-4 h-full">
+      <div className="p-4 pb-20 overflow-auto">
         {isSelectedGeneral && <Checks checks={generalChecks} />}
         {!isSelectedGeneral && selectedDifficulty && !isLoadingDifficulty && (
           <Checks checks={getDifficultyChecks(selectedDifficulty)} />

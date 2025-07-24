@@ -26,7 +26,7 @@ export function BeatmapProvider({ children }) {
    * }
    *
    * The reason we use the .osu file path to identify difficulties is to be able
-   * to store beatmaps which don't have an id because they are not uploaded
+   * to store beatmaps which don't have an id if they are not uploaded
    */
   const [difficultyChecks, setDifficultyChecks] = useState<
     Record<DifficultyPath, { general_status: CheckStatus; checks: ICheck[] }>
