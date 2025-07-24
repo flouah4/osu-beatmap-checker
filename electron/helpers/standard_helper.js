@@ -63,7 +63,7 @@ function get_difficulty_data(osu_lines) {
       } else if (key === "HPDrainRate") {
         hp_drain_rate = +value;
       } else if (key === "CircleSize") {
-        hp_drain_rate = +value;
+        circle_size = +value;
       }
     } else if (section === "[TimingPoints]") {
       const parts = line.split(",");
