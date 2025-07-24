@@ -14,7 +14,7 @@ Beatmap Checker is actively being updated and feedback is appreciated. If you wa
 
 ## Downloading
 
-> [!INFO]
+> [!NOTE]
 > This application can only be used in Windows. I plan on adding macOS and Linux support in the future.
 
 Head over to the [releases](https://github.com/flouah4/osu-beatmap-checker/releases) section and choose your preferred installer method (portable or setup).
