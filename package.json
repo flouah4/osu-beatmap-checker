@@ -1,6 +1,6 @@
 {
   "name": "osu-beatmap-checker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "flouah <flouah4@gmail.com> (https://github.com/flouah4)",
   "description": "A tool to check osu! beatmaps",
   "repository": {
