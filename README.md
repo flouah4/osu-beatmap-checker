@@ -10,11 +10,11 @@
 
 ## Disclaimer
 
-Beatmap Checker is actively being updated, and feedback is appreciated. If you want to contribute by suggesting new features or reporting issues, please message me on discord (flouah) or [in-game](https://osu.ppy.sh/community/chat?sendto=8030129).
+Beatmap Checker is actively being updated and feedback is appreciated. If you want to contribute by suggesting new features or reporting issues, please message me on discord (flouah) or [in-game](https://osu.ppy.sh/community/chat?sendto=8030129).
 
-## Installing
+## Downloading
 
-> [!WARNING]
+> [!INFO]
 > This application can only be used in Windows. I plan on adding macOS and Linux support in the future.
 
 Head over to the [releases](https://github.com/flouah4/osu-beatmap-checker/releases) section and choose your preferred installer method (portable or setup).
@@ -44,6 +44,7 @@ Head over to the [releases](https://github.com/flouah4/osu-beatmap-checker/relea
 - Enable custom colors is unchecked
 - [1/1 sliders with multiple reverses on Easy difficulties](https://osu.ppy.sh/wiki/en/Ranking_criteria/osu%21#easy:~:text=Avoid%201/1%20sliders%20with%20multiple%20reverses) [^1]
 - [1/2 sliders with multiple reverses on Normal difficulties](https://osu.ppy.sh/wiki/en/Ranking_criteria/osu%21#easy:~:text=Avoid%201/2%20sliders%20with%20multiple%20reverses) [^1]
+- Difficulty settings
 
 [^1]: Assuming 180 BPM
 
