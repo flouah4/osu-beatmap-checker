@@ -3,11 +3,15 @@ import { CloseModalButton } from "../buttons/close_modal_button";
 import { Toggle } from "../toggles/toggle";
 
 export function SettingsModal() {
-  const { showOkChecks, toggleShowOkChecks } = useSettings();
+  const { showOkChecks, toggleShowOkChecks, darkMode, toggleDarkMode } = useSettings();
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-regular">Dark mode</p>
+          <Toggle onClick={toggleDarkMode} isToggled={darkMode} />
+        </div>
         <div className="flex items-center justify-between gap-4">
           <p className="text-regular">Hide checks which are fine</p>
           <Toggle onClick={toggleShowOkChecks} isToggled={!showOkChecks} />

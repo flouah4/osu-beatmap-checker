@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-@theme {
+/* Light theme (default theme!) */
+.light-theme {
   --color-neo-purple: #cca2c0;
   --color-dark-neo-purple: #614054;
   --color-background: #f5e1e1;
@@ -9,7 +10,34 @@
   --color-neo-green: #d0f2cb;
   --color-neo-red: #f89290;
   --color-input: #fff8f8;
+  --color-text: #614054;
+  --color-box-bg: #fff8f8;
+  --color-box-bg-hover: #f0f0f0;
+}
 
+/* Dark theme */
+.dark-theme {
+  --color-neo-purple: #8b5cf6;
+  --color-dark-neo-purple: #1e1b4b;
+  --color-background: #0f0f23;
+  --color-neo-blue: #3b82f6;
+  --color-neo-yellow: #f59e0b;
+  --color-neo-green: #10b981;
+  --color-neo-red: #ef4444;
+  --color-input: #1f2937;
+  --color-text: #e5e7eb;
+  --color-box-bg: #1f2937;
+  --color-box-bg-hover: #374151;
+}
+
+@theme {
+  --color-neo-purple: #8b5cf6;
+  --color-neo-blue: #3b82f6;
+  --color-neo-yellow: #f59e0b;
+  --color-neo-green: #10b981;
+  --color-neo-red: #ef4444;
+  --color-background: #0f0f23;
+  
   --text-title: 24px;
   --text-title--font-weight: 700;
   --text-lead: 18px;
@@ -25,7 +53,8 @@
 body {
   font-family: "DM Sans", sans-serif;
   font-optical-sizing: auto;
-  color: var(--color-dark-neo-purple);
+  color: var(--color-text);
+  background-color: var(--color-background);
 }
 
 .drag {
@@ -37,33 +66,82 @@ body {
 }
 
 .neo-box {
-  box-shadow: 2px 2px 0px 0px var(--color-dark-neo-purple);
+  box-shadow: 2px 2px 0px 0px var(--color-neo-purple);
   border-width: 2px;
   border-radius: 4px;
+  border-color: var(--color-neo-purple);
+  background-color: var(--color-box-bg);
 }
 
 .big-neo-box {
-  box-shadow: 4px 4px 0px 0px var(--color-dark-neo-purple);
+  box-shadow: 4px 4px 0px 0px var(--color-neo-purple);
   border-width: 4px;
   border-radius: 8px;
+  border-color: var(--color-neo-purple);
+  background-color: var(--color-box-bg);
 }
 
 .hoverable-neo-box {
-  box-shadow: 2px 2px 0px 0px var(--color-dark-neo-purple);
+  box-shadow: 2px 2px 0px 0px var(--color-neo-purple);
   border-width: 2px;
   border-radius: 4px;
+  border-color: var(--color-neo-purple);
+  background-color: var(--color-box-bg);
 }
 
 .hoverable-neo-box:hover {
   translate: 2px 2px;
-  box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
+  box-shadow: 0px 0px 0px 0px var(--color-neo-purple);
 }
 
 .focused-neo-box {
   border-width: 2px;
   border-radius: 4px;
   translate: 2px 2px;
-  box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
+  box-shadow: 0px 0px 0px 0px var(--color-neo-purple);
+  border-color: var(--color-neo-purple);
+  background-color: var(--color-box-bg-hover);
+}
+
+/* Theme-aware color overrides for Tailwind classes */
+.light-theme .bg-neo-purple {
+  background-color: var(--color-neo-purple) !important;
+}
+
+.light-theme .bg-neo-blue {
+  background-color: var(--color-neo-blue) !important;
+}
+
+.light-theme .bg-neo-yellow {
+  background-color: var(--color-neo-yellow) !important;
+}
+
+.light-theme .bg-neo-green {
+  background-color: var(--color-neo-green) !important;
+}
+
+.light-theme .bg-neo-red {
+  background-color: var(--color-neo-red) !important;
+}
+
+.dark-theme .bg-neo-purple {
+  background-color: var(--color-neo-purple) !important;
+}
+
+.dark-theme .bg-neo-blue {
+  background-color: var(--color-neo-blue) !important;
+}
+
+.dark-theme .bg-neo-yellow {
+  background-color: var(--color-neo-yellow) !important;
+}
+
+.dark-theme .bg-neo-green {
+  background-color: var(--color-neo-green) !important;
+}
+
+.dark-theme .bg-neo-red {
+  background-color: var(--color-neo-red) !important;
 }
 
 .scrollbar-hidden {
