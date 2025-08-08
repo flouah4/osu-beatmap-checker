@@ -1,5 +1,7 @@
 import { DisallowedArtistCheck } from "../checks/metadata/disallowed_artist_check.js";
 import { MissingSourceCheck } from "../checks/metadata/missing_source_check.js";
+import { MissingGenreTagCheck } from "../checks/metadata/missing_genre_tag_check.js";
+import { MissingLanguageTagCheck } from "../checks/metadata/missing_language_tag_check.js";
 
 export function check_disallowed_artist(artist, source, tags) {
   console.log("Executing function (check_disallowed_artist)", {
@@ -85,4 +87,117 @@ export function check_missing_source(title, source) {
     return new MissingSourceCheck({ status: "ok" });
   }
   return null;
+}
+
+export function check_missing_genre_tag(tags) {
+  console.log("Executing function (check_missing_genre_tag)", { tags });
+
+  const genre_sets = [
+    ["video", "game"],
+    ["anime"],
+    ["rock"],
+    ["pop"],
+    ["novelty"],
+    ["hip", "hop"],
+    ["electronic"],
+    ["metal"],
+    ["classical"],
+    ["folk"],
+    ["jazz"],
+  ];
+
+  if (!tags || typeof tags !== "string" || tags.trim() === "") {
+    return new MissingGenreTagCheck({ status: "warning" });
+  }
+
+  const normalizedTags = tags.toLowerCase();
+
+  const hasGenre = genre_sets.some((requiredWords) =>
+    requiredWords.every((word) => normalizedTags.includes(word))
+  );
+
+  if (hasGenre) {
+    return new MissingGenreTagCheck({ status: "ok" });
+  }
+
+  return new MissingGenreTagCheck({ status: "warning" });
+}
+
+export function check_missing_language_tag(tags) {
+  console.log("Executing function (check_missing_language_tag)", { tags });
+
+  const language_sets = [
+
+    ["english"],
+    ["chinese"],
+    ["french"],
+    ["german"],
+    ["italian"], 
+    ["japanese"],
+    ["korean"],
+    ["spanish"],
+    ["swedish"], 
+    ["russian"],
+    ["polish"],
+    ["instrumental"],
+
+    // Following are not web languages, but if we find these in the tags,
+    // web would need to be "Other" anyway, so no point in warning.
+    ["conlang"],
+    ["hindi"],
+    ["arabic"],
+    ["portugese"],
+    ["turkish"],
+    ["vietnamese"], 
+    ["persian"],
+    ["indonesian"],
+    ["ukrainian"],
+    ["romanian"],
+    ["dutch"],
+    ["thai"],
+    ["greek"],
+    ["somali"],
+    ["malay"],
+    ["hungarian"],
+    ["czech"],
+    ["norwegian"],
+    ["finnish"],
+    ["danish"],
+    ["latvia"],
+    ["lithuanian"],
+    ["estonian"],
+    ["punjabi"],
+    ["bengali"],
+
+    // Some extra ones MV didn't include, probably could be extended infinitely tbh
+    ["icelandic"],
+    ["bulgarian"],
+    ["croatian"],
+    ["hebrew"],
+    ["mongolian"],
+    ["serbian"],
+    ["slovak"],
+    ["slovenian"],
+    ["tagalog"],
+    ["tamil"],
+    ["telugu"],
+    ["urdu"],
+  
+  ];
+
+  if (!tags || typeof tags !== "string" || tags.trim() === "") {
+    return new MissingLanguageTagCheck({ status: "warning" });
+  }
+
+  const normalizedTags = tags.toLowerCase();
+
+  const hasLanguage = language_sets.some((requiredWords) =>
+    requiredWords.every((word) => normalizedTags.includes(word))
+  );
+
+  if (hasLanguage) {
+    return new MissingLanguageTagCheck({ status: "ok" });
+  }
+
+  return new MissingLanguageTagCheck({ status: "warning" });
 }

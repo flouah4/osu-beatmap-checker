@@ -14,6 +14,8 @@ import { check_combo_colors, check_preferred_skin } from "./skin_helper.js";
 import {
   check_disallowed_artist,
   check_missing_source,
+  check_missing_genre_tag,
+  check_missing_language_tag,
 } from "./metadata_helper.js";
 import {
   check_difficulty_settings,
@@ -210,6 +212,8 @@ export async function check_beatmap_general(beatmap_folder_path) {
     check_duplicated_background(beatmap_folder_path, osu_files),
     check_disallowed_artist(beatmap.artist, beatmap.source, beatmap.tags),
     check_missing_source(beatmap.title, beatmap.source),
+    check_missing_genre_tag(beatmap.tags),
+    check_missing_language_tag(beatmap.tags),
   ]);
   /** Check functions can either return a check, an array of checks, or null */
   const checks = result.filter((check) => check !== null).flat();
