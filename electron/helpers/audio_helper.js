@@ -5,6 +5,7 @@ import { spawn } from "child_process";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { parseFile } from "music-metadata";
 import { OverencodedAudioCheck } from "../checks/audio/overencoded_audio_check.js";
+import { AudioQualityCheck } from "../checks/audio/audio_quality_check.js";
 
 async function get_cutoff_frequency(audio_path) {
   /** Gets the audio cutoff frequency like you would do in spek */
@@ -186,4 +187,93 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
 
   console.log("Checked overencoded audio", check);
   return check;
+}
+
+export async function check_audio_quality(beatmap_folder_path, osu_files) {
+  console.log(
+    "Executing function (check_audio_quality)",
+    beatmap_folder_path
+  );
+
+  let audio_file = null;
+  for (const osu_file of osu_files) {
+    let in_general = false;
+    const lines = (
+      await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
+    ).split(/\r?\n/);
+    for (const line of lines) {
+      if (line === "[General]") {
+        in_general = true;
+        continue;
+      }
+      if (in_general) {
+        if (line.startsWith("[")) {
+          break;
+        }
+        const [key, value] = line.split(":");
+        if (key === "AudioFilename") {
+          audio_file = value.trim();
+          break;
+        }
+      }
+    }
+    if (audio_file) {
+      break;
+    }
+  }
+
+  if (!audio_file) {
+    return null;
+  }
+
+  const audio_path = path.join(beatmap_folder_path, audio_file);
+  return await check_audio_too_high_quality(audio_path);
+}
+
+async function check_audio_too_high_quality(audio_path) {
+  // Get the file extension to determine format
+  const file_extension = path.extname(audio_path).toLowerCase();
+  
+  // Define bitrate limits for different formats
+  const bitrate_limits = {
+    '.mp3': 192,
+    '.ogg': 208
+  };
+  
+  // Check if the file format is supported
+  if (!bitrate_limits[file_extension]) {
+    return null; // Skip unsupported formats
+  }
+  
+  try {
+    // Get the bitrate from the audio file
+    const header_bitrate = await get_header_bitrate(audio_path);
+    const max_bitrate = bitrate_limits[file_extension];
+    
+    let check;
+    if (header_bitrate > max_bitrate) {
+      check = new AudioQualityCheck({
+        status: "issue",
+        args: {
+          bitrate: Math.floor(header_bitrate),
+          max_bitrate: max_bitrate,
+          format: file_extension.substring(1).toUpperCase(), // Remove the dot and capitalize
+        },
+      });
+    } else {
+      check = new AudioQualityCheck({
+        status: "ok",
+        args: {
+          bitrate: Math.floor(header_bitrate),
+          max_bitrate: max_bitrate,
+          format: file_extension.substring(1).toUpperCase(), // Remove the dot and capitalize
+        },
+      });
+    }
+    
+    return check;
+  } catch (error) {
+    console.error("Error checking audio quality:", error);
+    return null;
+  }
 }
