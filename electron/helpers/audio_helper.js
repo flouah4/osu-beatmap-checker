@@ -5,7 +5,7 @@ import { spawn } from "child_process";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { parseFile } from "music-metadata";
 import { OverencodedAudioCheck } from "../checks/audio/overencoded_audio_check.js";
-import { AudioQualityCheck } from "../checks/audio/audio_quality_check.js";
+import { AudioTooHighQualityCheck } from "../checks/audio/audio_quality_check.js";
 
 async function get_cutoff_frequency(audio_path) {
   /** Gets the audio cutoff frequency like you would do in spek */
@@ -189,9 +189,9 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
   return check;
 }
 
-export async function check_audio_quality(beatmap_folder_path, osu_files) {
+export async function check_audio_too_high_quality_wrapper(beatmap_folder_path, osu_files) {
   console.log(
-    "Executing function (check_audio_quality)",
+    "Executing function (check_audio_too_high_quality_wrapper)",
     beatmap_folder_path
   );
 
@@ -252,7 +252,7 @@ async function check_audio_too_high_quality(audio_path) {
     
     let check;
     if (header_bitrate > max_bitrate) {
-      check = new AudioQualityCheck({
+      check = new AudioTooHighQualityCheck({
         status: "issue",
         args: {
           bitrate: Math.floor(header_bitrate),
@@ -261,7 +261,7 @@ async function check_audio_too_high_quality(audio_path) {
         },
       });
     } else {
-      check = new AudioQualityCheck({
+      check = new AudioTooHighQualityCheck({
         status: "ok",
         args: {
           bitrate: Math.floor(header_bitrate),

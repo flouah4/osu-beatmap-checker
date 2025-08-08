@@ -1,12 +1,12 @@
 import { Check } from "../check.js";
 
-export const AudioQualityCheck = Check.create({
+export const AudioTooHighQualityCheck = Check.create({
   title: {
-    ok: "Audio quality is within acceptable limits",
-    issue: "Audio quality is too high.",
+    ok: "Audio is not too high quality",
+    issue: "Audio is too high quality",
   },
   details: {
-    ok: "The audio file has a bitrate of %bitrate kbps which is within acceptable limits for %format files.",
-    issue: "The audio file has a bitrate of %bitrate kbps which is higher than the allowed limit of %max_bitrate kbps for %format files.",
+    ok: "The audio file has a bitrate of %bitrate kbps which is not too high for %format files.",
+    issue: "The audio file has a bitrate of %bitrate kbps which exceeds the maximum allowed %max_bitrate kbps for %format files.",
   },
 });
