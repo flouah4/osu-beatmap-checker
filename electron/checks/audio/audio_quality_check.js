@@ -1,6 +1,6 @@
 import { Check } from "../check.js";
 
-export const AudioTooHighQualityCheck = Check.create({
+export const TooHighQualityAudioCheck = Check.create({
   title: {
     ok: "Audio is not too high quality",
     issue: "Audio is too high quality",
