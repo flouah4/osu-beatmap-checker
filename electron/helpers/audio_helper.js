@@ -122,12 +122,7 @@ function get_expected_cutoff_frequency(header_bitrate) {
   return expected_cutoff_frequency;
 }
 
-export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
-  console.log(
-    "Executing function (check_overencoded_audio)",
-    beatmap_folder_path
-  );
-
+async function get_audio_filename(beatmap_folder_path, osu_files) {
   let audio_file = null;
   for (const osu_file of osu_files) {
     let in_general = false;
@@ -154,6 +149,19 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
       break;
     }
   }
+  return audio_file;
+}
+
+export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
+  console.log(
+    "Executing function (check_overencoded_audio)",
+    beatmap_folder_path
+  );
+
+  const audio_file = await get_audio_filename(
+    beatmap_folder_path,
+    osu_files
+  );
 
   if (!audio_file) {
     return null;
@@ -195,32 +203,10 @@ export async function check_audio_too_high_quality_wrapper(beatmap_folder_path, 
     beatmap_folder_path
   );
 
-  let audio_file = null;
-  for (const osu_file of osu_files) {
-    let in_general = false;
-    const lines = (
-      await fs.readFile(path.join(beatmap_folder_path, osu_file), "utf8")
-    ).split(/\r?\n/);
-    for (const line of lines) {
-      if (line === "[General]") {
-        in_general = true;
-        continue;
-      }
-      if (in_general) {
-        if (line.startsWith("[")) {
-          break;
-        }
-        const [key, value] = line.split(":");
-        if (key === "AudioFilename") {
-          audio_file = value.trim();
-          break;
-        }
-      }
-    }
-    if (audio_file) {
-      break;
-    }
-  }
+  const audio_file = await get_audio_filename(
+    beatmap_folder_path,
+    osu_files
+  );
 
   if (!audio_file) {
     return null;
