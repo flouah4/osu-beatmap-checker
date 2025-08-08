@@ -16,6 +16,7 @@ import {
   check_missing_source,
   check_missing_genre_tag,
   check_missing_language_tag,
+  check_identical_tags_across_difficulties,
 } from "./metadata_helper.js";
 import {
   check_difficulty_settings,
@@ -214,6 +215,7 @@ export async function check_beatmap_general(beatmap_folder_path) {
     check_missing_source(beatmap.title, beatmap.source),
     check_missing_genre_tag(beatmap.tags),
     check_missing_language_tag(beatmap.tags),
+    check_identical_tags_across_difficulties(beatmap_folder_path, osu_files),
   ]);
   /** Check functions can either return a check, an array of checks, or null */
   const checks = result.filter((check) => check !== null).flat();
