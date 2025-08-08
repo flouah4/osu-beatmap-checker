@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-@theme {
+/* Theme variables */
+.light-theme {
   --color-neo-purple: #cca2c0;
   --color-dark-neo-purple: #614054;
   --color-background: #f5e1e1;
@@ -9,7 +10,27 @@
   --color-neo-green: #d0f2cb;
   --color-neo-red: #f89290;
   --color-input: #fff8f8;
+  --color-text: #614054;
+  --color-box-bg: #fff8f8;
+  --color-box-bg-hover: #f0f0f0;
+}
 
+.dark-theme {
+  --color-neo-purple: #8b5cf6;
+  --color-dark-neo-purple: #1e1b4b;
+  --color-background: #0f0f23;
+  --color-neo-blue: #3b82f6;
+  --color-neo-yellow: #f59e0b;
+  --color-neo-green: #10b981;
+  --color-neo-red: #ef4444;
+  --color-input: #1f2937;
+  --color-text: #e5e7eb;
+  --color-box-bg: #1f2937;
+  --color-box-bg-hover: #374151;
+}
+
+/* Typography */
+@theme {
   --text-title: 24px;
   --text-title--font-weight: 700;
   --text-lead: 18px;
@@ -22,52 +43,63 @@
   --text-small-bold--font-weight: 700;
 }
 
+/* Base styles */
 body {
   font-family: "DM Sans", sans-serif;
   font-optical-sizing: auto;
-  color: var(--color-dark-neo-purple);
+  color: var(--color-text);
+  background-color: var(--color-background);
 }
 
-.drag {
-  -webkit-app-region: drag;
-}
+/* Electron window controls */
+.drag { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }
 
-.no-drag {
-  -webkit-app-region: no-drag;
-}
-
-.neo-box {
-  box-shadow: 2px 2px 0px 0px var(--color-dark-neo-purple);
-  border-width: 2px;
+/* Neo-box components */
+.neo-box, .hoverable-neo-box {
+  box-shadow: 2px 2px 0px 0px var(--color-neo-purple);
+  border: 2px solid var(--color-neo-purple);
   border-radius: 4px;
+  background-color: var(--color-box-bg);
 }
 
 .big-neo-box {
-  box-shadow: 4px 4px 0px 0px var(--color-dark-neo-purple);
-  border-width: 4px;
+  box-shadow: 4px 4px 0px 0px var(--color-neo-purple);
+  border: 4px solid var(--color-neo-purple);
   border-radius: 8px;
-}
-
-.hoverable-neo-box {
-  box-shadow: 2px 2px 0px 0px var(--color-dark-neo-purple);
-  border-width: 2px;
-  border-radius: 4px;
+  background-color: var(--color-box-bg);
 }
 
 .hoverable-neo-box:hover {
   translate: 2px 2px;
-  box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
+  box-shadow: none;
 }
 
 .focused-neo-box {
-  border-width: 2px;
+  border: 2px solid var(--color-neo-purple);
   border-radius: 4px;
   translate: 2px 2px;
-  box-shadow: 0px 0px 0px 0px var(--color-dark-neo-purple);
+  box-shadow: none;
+  background-color: var(--color-box-bg-hover);
 }
 
-.scrollbar-hidden {
-  &::-webkit-scrollbar {
-    display: none;
-  }
+/* Theme-aware color overrides */
+.light-theme .bg-neo-purple,
+.dark-theme .bg-neo-purple { background-color: var(--color-neo-purple); }
+
+.light-theme .bg-neo-blue,
+.dark-theme .bg-neo-blue { background-color: var(--color-neo-blue); }
+
+.light-theme .bg-neo-yellow,
+.dark-theme .bg-neo-yellow { background-color: var(--color-neo-yellow); }
+
+.light-theme .bg-neo-green,
+.dark-theme .bg-neo-green { background-color: var(--color-neo-green); }
+
+.light-theme .bg-neo-red,
+.dark-theme .bg-neo-red { background-color: var(--color-neo-red); }
+
+/* Hide scrollbars */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
 }
