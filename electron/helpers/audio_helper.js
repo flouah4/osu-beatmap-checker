@@ -105,6 +105,25 @@ async function get_header_bitrate(audio_path) {
   return metadata.format.bitrate / 1000;
 }
 
+async function get_average_bitrate(audio_path) {
+  // Compute true average bitrate from file size and duration
+  const [stats, metadata] = await Promise.all([
+    fs.stat(audio_path),
+    parseFile(audio_path, { skipCovers: true }),
+  ]);
+
+  const durationSeconds = metadata?.format?.duration;
+  if (!durationSeconds || !Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    // Fallback: use header bitrate if duration is unavailable
+    return await get_header_bitrate(audio_path);
+  }
+
+  const bits = stats.size * 8;
+  const bitsPerSecond = bits / durationSeconds;
+  const kiloBitsPerSecond = bitsPerSecond / 1000;
+  return kiloBitsPerSecond;
+}
+
 function get_expected_cutoff_frequency(header_bitrate) {
   const expected_bitrate_table = [
     { header_bitrate: 128, cutoff_frequency: 150 },
@@ -232,16 +251,17 @@ async function check_audio_too_high_quality(audio_path) {
   }
   
   try {
-    // Get the bitrate from the audio file
-    const header_bitrate = await get_header_bitrate(audio_path);
+    // Use a more accurate bitrate: average kbps computed from file size and duration
+    const average_bitrate = await get_average_bitrate(audio_path);
     const max_bitrate = bitrate_limits[file_extension];
     
     let check;
-    if (header_bitrate > max_bitrate) {
+    const rounded = Math.round(average_bitrate);
+    if (rounded > max_bitrate) {
       check = new TooHighQualityAudioCheck({
         status: "issue",
         args: {
-          bitrate: Math.floor(header_bitrate),
+          bitrate: rounded,
           max_bitrate: max_bitrate,
           format: file_extension.substring(1).toUpperCase(), // Remove the dot and capitalize
         },
@@ -250,7 +270,7 @@ async function check_audio_too_high_quality(audio_path) {
       check = new TooHighQualityAudioCheck({
         status: "ok",
         args: {
-          bitrate: Math.floor(header_bitrate),
+          bitrate: rounded,
           max_bitrate: max_bitrate,
           format: file_extension.substring(1).toUpperCase(), // Remove the dot and capitalize
         },
