@@ -5,6 +5,7 @@ import { spawn } from "child_process";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { parseFile } from "music-metadata";
 import { OverencodedAudioCheck } from "../checks/audio/overencoded_audio_check.js";
+import { TooHighQualityAudioCheck } from "../checks/audio/audio_quality_check.js";
 
 async function get_cutoff_frequency(audio_path) {
   /** Gets the audio cutoff frequency like you would do in spek */
@@ -104,6 +105,25 @@ async function get_header_bitrate(audio_path) {
   return metadata.format.bitrate / 1000;
 }
 
+async function get_average_bitrate(audio_path) {
+  // Compute true average bitrate from file size and duration
+  const [stats, metadata] = await Promise.all([
+    fs.stat(audio_path),
+    parseFile(audio_path, { skipCovers: true }),
+  ]);
+
+  const durationSeconds = metadata?.format?.duration;
+  if (!durationSeconds || !Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    // Fallback: use header bitrate if duration is unavailable
+    return await get_header_bitrate(audio_path);
+  }
+
+  const bits = stats.size * 8;
+  const bitsPerSecond = bits / durationSeconds;
+  const kiloBitsPerSecond = bitsPerSecond / 1000;
+  return kiloBitsPerSecond;
+}
+
 function get_expected_cutoff_frequency(header_bitrate) {
   const expected_bitrate_table = [
     { header_bitrate: 128, cutoff_frequency: 150 },
@@ -121,12 +141,7 @@ function get_expected_cutoff_frequency(header_bitrate) {
   return expected_cutoff_frequency;
 }
 
-export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
-  console.log(
-    "Executing function (check_overencoded_audio)",
-    beatmap_folder_path
-  );
-
+async function get_audio_filename(beatmap_folder_path, osu_files) {
   let audio_file = null;
   for (const osu_file of osu_files) {
     let in_general = false;
@@ -153,6 +168,19 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
       break;
     }
   }
+  return audio_file;
+}
+
+export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
+  console.log(
+    "Executing function (check_overencoded_audio)",
+    beatmap_folder_path
+  );
+
+  const audio_file = await get_audio_filename(
+    beatmap_folder_path,
+    osu_files
+  );
 
   if (!audio_file) {
     return null;
@@ -186,4 +214,72 @@ export async function check_overencoded_audio(beatmap_folder_path, osu_files) {
 
   console.log("Checked overencoded audio", check);
   return check;
+}
+
+export async function check_audio_too_high_quality_wrapper(beatmap_folder_path, osu_files) {
+  console.log(
+    "Executing function (check_audio_too_high_quality_wrapper)",
+    beatmap_folder_path
+  );
+
+  const audio_file = await get_audio_filename(
+    beatmap_folder_path,
+    osu_files
+  );
+
+  if (!audio_file) {
+    return null;
+  }
+
+  const audio_path = path.join(beatmap_folder_path, audio_file);
+  return await check_audio_too_high_quality(audio_path);
+}
+
+async function check_audio_too_high_quality(audio_path) {
+  // Get the file extension to determine format
+  const file_extension = path.extname(audio_path).toLowerCase();
+  
+  // Define bitrate limits for different formats
+  const bitrate_limits = {
+    '.mp3': 192,
+    '.ogg': 208
+  };
+  
+  // Check if the file format is supported
+  if (!bitrate_limits[file_extension]) {
+    return null; // Skip unsupported formats
+  }
+  
+  try {
+    // Use a more accurate bitrate: average kbps computed from file size and duration
+    const average_bitrate = await get_average_bitrate(audio_path);
+    const max_bitrate = bitrate_limits[file_extension];
+    
+    let check;
+    const rounded = Math.round(average_bitrate);
+    if (rounded > max_bitrate) {
+      check = new TooHighQualityAudioCheck({
+        status: "issue",
+        args: {
+          bitrate: rounded,
+          max_bitrate: max_bitrate,
+          format: file_extension.substring(1).toUpperCase(), // Remove the dot and capitalize
+        },
+      });
+    } else {
+      check = new TooHighQualityAudioCheck({
+        status: "ok",
+        args: {
+          bitrate: rounded,
+          max_bitrate: max_bitrate,
+          format: file_extension.substring(1).toUpperCase(), // Remove the dot and capitalize
+        },
+      });
+    }
+    
+    return check;
+  } catch (error) {
+    console.error("Error checking audio quality:", error);
+    return null;
+  }
 }

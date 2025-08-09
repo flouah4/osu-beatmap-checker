@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import os from "os";
-import { check_overencoded_audio } from "./audio_helper.js";
+import { check_overencoded_audio, check_audio_too_high_quality_wrapper } from "./audio_helper.js";
 import { check_samples_match_playback_rate } from "./hitsounds_helper.js";
 import {
   check_epilepsy_warning,
@@ -206,6 +206,7 @@ export async function check_beatmap_general(beatmap_folder_path) {
 
   const result = await Promise.all([
     check_overencoded_audio(beatmap_folder_path, osu_files),
+    check_audio_too_high_quality_wrapper(beatmap_folder_path, osu_files),
     check_video(beatmap_folder_path, osu_files),
     check_duplicated_background(beatmap_folder_path, osu_files),
     check_disallowed_artist(beatmap.artist, beatmap.source, beatmap.tags),
