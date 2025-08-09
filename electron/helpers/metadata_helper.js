@@ -2,7 +2,7 @@ import { DisallowedArtistCheck } from "../checks/metadata/disallowed_artist_chec
 import { MissingSourceCheck } from "../checks/metadata/missing_source_check.js";
 import { MissingGenreTagCheck } from "../checks/metadata/missing_genre_tag_check.js";
 import { MissingLanguageTagCheck } from "../checks/metadata/missing_language_tag_check.js";
-import { IdenticalTagsCheck } from "../checks/metadata/identical_tags_check.js";
+import { IdenticalMetadataCheck } from "../checks/metadata/identical_metadata_check.js";
 import fs from "fs/promises";
 import path from "path";
 
@@ -221,10 +221,18 @@ export async function check_identical_tags_across_difficulties(
     const lines = (await fs.readFile(file_path, "utf8")).split(/\r?\n/);
 
     let in_metadata = false;
-    let tagsValue = "";
+    const meta = {
+      Title: "",
+      TitleUnicode: "",
+      Artist: "",
+      ArtistUnicode: "",
+      Tags: "",
+      Source: "",
+    };
     let diffName = null; // difficulty name from Version
 
-    for (const line of lines) {
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
       if (line === "[Metadata]") {
         in_metadata = true;
         continue;
@@ -234,12 +242,12 @@ export async function check_identical_tags_across_difficulties(
           break;
         }
         const [rawKey, ...rest] = line.split(":");
-        const key = rawKey;
-        const value = rest.join(":");
-        if (key === "Tags") {
-          tagsValue = (value || "").trim();
+        const key = (rawKey || "").trim();
+        const value = rest.join(":").trim();
+        if (key in meta) {
+          meta[key] = value || "";
         } else if (key === "Version") {
-          diffName = (value || "").trim();
+          diffName = value || "";
         }
       }
     }
@@ -249,52 +257,66 @@ export async function check_identical_tags_across_difficulties(
       diffName = path.parse(osu_file).name;
     }
 
-    entries.push({ file: osu_file, name: diffName, tags: tagsValue });
+    entries.push({
+      file: osu_file,
+      name: diffName,
+      title: meta.Title,
+      titleUnicode: meta.TitleUnicode,
+      artist: meta.Artist,
+      artistUnicode: meta.ArtistUnicode,
+      tags: meta.Tags,
+      source: meta.Source,
+    });
   }
 
-  const uniqueTags = new Set(entries.map((e) => e.tags));
+  // Build baseline from the first entry
+  const differing = [];
 
-  if (uniqueTags.size <= 1) {
-    return new IdenticalTagsCheck({ status: "ok" });
-  }
+  const fields = [
+    { key: "title", label: "Title" },
+    { key: "titleUnicode", label: "TitleUnicode" },
+    { key: "artist", label: "Artist" },
+    { key: "artistUnicode", label: "ArtistUnicode" },
+    { key: "tags", label: "Tags" },
+    { key: "source", label: "Source" },
+  ];
 
-  // Group files by their tags value
-  const tagsToEntries = new Map();
-  for (const entry of entries) {
-    const list = tagsToEntries.get(entry.tags) || [];
-    list.push(entry);
-    tagsToEntries.set(entry.tags, list);
-  }
+  for (const { key, label } of fields) {
+    const valueToEntries = new Map();
+    for (const entry of entries) {
+      const value = entry[key] ?? "";
+      const list = valueToEntries.get(value) || [];
+      list.push(entry);
+      valueToEntries.set(value, list);
+    }
 
-  // Determine if there is a clear majority group
-  let maxSize = 0;
-  for (const list of tagsToEntries.values()) {
-    if (list.length > maxSize) maxSize = list.length;
-  }
-  const numMaxGroups = [...tagsToEntries.values()].filter(
-    (list) => list.length === maxSize
-  ).length;
+    let maxSize = 0;
+    for (const list of valueToEntries.values()) {
+      if (list.length > maxSize) maxSize = list.length;
+    }
+    const maxGroups = [...valueToEntries.values()].filter(
+      (list) => list.length === maxSize
+    );
 
-  let differingFiles;
-  if (numMaxGroups > 1) {
-    // Tie for largest group size (e.g., two difficulties with two different tags)
-    // In this case, list all files as differing
-    differingFiles = entries.map((e) => e.name);
-  } else {
-    // Clear majority exists; list files that are not in the majority group
-    let baselineTags = null;
-    for (const [tags, list] of tagsToEntries.entries()) {
-      if (list.length === maxSize) {
-        baselineTags = tags;
-        break;
+    if (maxGroups.length === 1) {
+      const majoritySet = new Set(maxGroups[0].map((e) => e.file));
+      for (const entry of entries) {
+        if (!majoritySet.has(entry.file)) {
+          differing.push(`${label} (${entry.name})`);
+        }
+      }
+    } else {
+      // Tie: consider all entries as differing for this field
+      for (const entry of entries) {
+        differing.push(`${label} (${entry.name})`);
       }
     }
-    differingFiles = entries
-      .filter((e) => e.tags !== baselineTags)
-      .map((e) => e.name);
   }
 
-  const differences = differingFiles.join(", ");
+  if (differing.length === 0) {
+    return new IdenticalMetadataCheck({ status: "ok" });
+  }
 
-  return new IdenticalTagsCheck({ status: "issue", args: { differences } });
+  const differences = differing.join(", ");
+  return new IdenticalMetadataCheck({ status: "issue", args: { differences } });
 }
